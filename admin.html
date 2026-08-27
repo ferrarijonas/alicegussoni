@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Inscrições — Pão de Verdade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #FCFBF9;
+      --text: #212121;
+      --text-soft: #6E6A64;
+      --line: #E2DED7;
+      --accent: #4A2E1B;
+      --accent-soft: #EFEAE3;
+      --green: #2E7D32;
+      --amber: #B26A00;
+      --red: #C62828;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Open Sans', 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    header { background: #2B1910; color: #F3EDE3; padding: 18px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    header .brand { display: flex; align-items: center; gap: 14px; }
+    header .brand img { height: 44px; width: auto; }
+    header h1 { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; }
+    header h1 span { color: #E9B873; }
+    header .hint { color: #D9CCB8; font-size: .82rem; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 28px; }
+
+    .gate { max-width: 380px; margin: 60px auto; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 36px; box-shadow: 0 12px 34px rgba(33,33,33,.1); text-align: center; }
+    .gate h2 { font-family: 'Playfair Display', serif; margin-bottom: 6px; }
+    .gate p { color: var(--text-soft); font-size: .9rem; margin-bottom: 18px; }
+    .gate input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 14px; font-size: 1rem; }
+    .gate button { width: 100%; padding: 13px; background: var(--text); color: #fff; border: none; border-radius: 999px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+    .gate .err { color: var(--red); font-size: .85rem; margin-bottom: 12px; }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+    .stat { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 16px; text-align: center; }
+    .stat b { display: block; font-size: 1.8rem; font-family: Georgia, serif; }
+    .stat span { color: var(--text-soft); font-size: .85rem; }
+    .stat.pago b { color: var(--green); }
+    .stat.aguardando b { color: var(--amber); }
+
+    .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; align-items: center; }
+    .filters select, .filters input { padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-size: .9rem; }
+    .filters button { padding: 10px 18px; border: none; border-radius: 999px; background: var(--text); color: #fff; font-weight: 700; cursor: pointer; }
+    .filters .btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+
+    table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; font-size: .88rem; }
+    th { text-align: left; padding: 12px 14px; background: var(--accent-soft); color: var(--accent); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+    td { padding: 11px 14px; border-top: 1px solid var(--line); vertical-align: middle; }
+    tr:hover td { background: #FBF9F5; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: .78rem; font-weight: 700; }
+    .badge.pago { background: #E8F5E9; color: var(--green); }
+    .badge.aguardando { background: #FFF3E0; color: var(--amber); }
+    .badge.recusado, .badge.cancelado, .badge.rejeitado { background: #FFEBEE; color: var(--red); }
+    .btn-small { border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--accent); padding: 5px 10px; font-size: .74rem; font-weight: 700; cursor: pointer; }
+    .btn-small:hover { background: var(--accent-soft); }
+    .btn-del { color: var(--red); border-color: #F0C9C9; }
+    .btn-del:hover { background: #FFEBEE; }
+    .btn-confirm { color: var(--green); border-color: #C8E6C9; }
+    .btn-confirm:hover { background: #E8F5E9; }
+    .pdv-sep { border-top: 1px dashed var(--line); margin: 6px 0; }
+
+    .turmas-box { margin-top: 28px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
+    .turmas-box h2 { font-size: 1rem; margin-bottom: 12px; color: var(--accent); }
+    .cupom-gerar { background: var(--accent-soft); border-radius: 10px; padding: 14px; }
+    .cupom-tipo { display: flex; gap: 18px; font-size: .9rem; margin-bottom: 10px; flex-wrap: wrap; }
+    .cupom-campos { display: flex; gap: 8px; flex-wrap: wrap; }
+    .cupom-campos input { padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: .9rem; flex: 1 1 140px; }
+    .btn-cupom { padding: 10px 18px; border: none; border-radius: 999px; background: var(--text); color: #fff; font-weight: 700; cursor: pointer; }
+    .cupom-code { font-family: Consolas, monospace; font-weight: 700; font-size: 1.05rem; color: var(--accent); }
+    #cupResult { margin-top: 10px; font-size: .9rem; }
+    .turma-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px dashed var(--line); font-size: .9rem; flex-wrap: wrap; }
+    .turma-item:last-child { border-bottom: none; }
+    .turma-item .pills { margin-left: auto; display: flex; gap: 8px; }
+    .pill { font-size: .75rem; background: var(--accent-soft); padding: 3px 10px; border-radius: 999px; }
+    .pill.green { background: #E8F5E9; color: var(--green); }
+    .pill.amber { background: #FFF3E0; color: var(--amber); }
+
+    .empty { padding: 40px; text-align: center; color: var(--text-soft); }
+    .muted { color: var(--text-soft); }
+    .mt { margin-top: 18px; }
+    .small { font-size: .8rem; }
+    @media (max-width: 640px) {
+      .wrap { padding: 16px; }
+      table { font-size: .8rem; }
+      th, td { padding: 9px 10px; }
+      .hide-mobile { display: none; }
+    }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(33,33,33,.45); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+    .modal { background: #fff; border-radius: 14px; max-width: 540px; width: 100%; max-height: 86vh; overflow: auto; padding: 26px; box-shadow: 0 18px 50px rgba(33,33,33,.25); }
+    .modal h3 { font-family: 'Playfair Display', serif; margin-bottom: 4px; }
+    .modal .sub { color: var(--text-soft); font-size: .88rem; margin-bottom: 16px; }
+    .modal .btn-close { float: right; background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-soft); line-height: 1; margin: -6px -6px 0 0; }
+    .modal .row { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px dashed var(--line); font-size: .9rem; }
+    .modal .row b { color: var(--text-soft); font-weight: 600; white-space: nowrap; }
+    .modal .row span { text-align: right; word-break: break-word; }
+    .modal-actions { display: grid; gap: 10px; margin-top: 18px; }
+    .modal-actions .btn-small { padding: 12px 14px; font-size: .9rem; text-align: left; border-radius: 10px; }
+    .form-label { display: block; font-size: .78rem; font-weight: 700; color: var(--accent); margin: 12px 0 4px; text-transform: uppercase; letter-spacing: .04em; }
+    .edit { width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 4px; font-size: .9rem; font-family: inherit; box-sizing: border-box; }
+    .edit:focus { outline: 2px solid var(--accent); border-color: transparent; }
+    textarea.edit { min-height: 70px; resize: vertical; }
+    .btn-primary-modal { width: 100%; padding: 14px; margin-top: 16px; background: var(--text); color: #fff; border: none; border-radius: 999px; font-weight: 700; font-size: 1rem; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <img src="assets/img/marca-preta.png" alt="Pão de Verdade">
+      <h1>Pão de Verdade — <span>Painel de Inscrições</span></h1>
+    </div>
+    <div class="hint">Atualizado em tempo real</div>
+  </header>
+
+  <div class="wrap">
+    <div class="gate" id="gate" hidden>
+      <h2>Painel de Inscrições</h2>
+      <p>Digite a senha para acessar.</p>
+      <div class="err" id="gateErr" hidden>Senha incorreta. Tente novamente.</div>
+      <input type="password" id="senhaInput" placeholder="Senha">
+      <button id="btnEntrar" onclick="entrar()">Entrar</button>
+    </div>
+
+    <div id="conteudo" hidden>
+      <div class="stats" id="stats">
+        <div class="stat pago"><b id="stPago">–</b><span>Inscritos (pagos)</span></div>
+        <div class="stat aguardando"><b id="stAguardando">–</b><span>Aguardando pagamento</span></div>
+        <div class="stat"><b id="stTotal">–</b><span>Total de tentativas</span></div>
+        <div class="stat"><b id="stCreditos">–</b><span>Crédito de convites (R$)</span></div>
+      </div>
+
+      <div class="filters">
+        <select id="fCurso">
+          <option value="">Todos os cursos</option>
+          <option value="Pão">Curso de Pão</option>
+          <option value="Pizza">Curso de Pizza</option>
+          <option value="Pão + Pizza">Pão + Pizza</option>
+        </select>
+        <select id="fStatus">
+          <option value="">Todos os status</option>
+          <option value="pago" selected>Pago</option>
+          <option value="aguardando">Aguardando</option>
+          <option value="recusado">Recusado</option>
+        </select>
+        <input type="text" id="fBusca" placeholder="Buscar por nome, WhatsApp ou e-mail…">
+        <button onclick="carregar()">Atualizar</button>
+        <button class="btn-ghost" onclick="sair()">Sair</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Curso</th>
+            <th>Turma</th>
+            <th>Status</th>
+            <th>Contato</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="6" class="empty">Carregando inscritos…</td></tr>
+        </tbody>
+      </table>
+
+      <div class="turmas-box">
+        <h2>Turmas e links de grupo (link preenchido = convite automático enviado)</h2>
+        <div id="turmas"></div>
+      </div>
+
+      <div class="turmas-box">
+        <h2>Pedidos (dupla / dois cursos · desconto 15% · pagamento único)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Pedido</th>
+              <th>Status</th>
+              <th>Pessoas</th>
+              <th>Bruto</th>
+              <th>Desconto</th>
+              <th>Total</th>
+              <th>Forma</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyPedidos">
+            <tr><td colspan="8" class="empty">Carregando pedidos…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="turmas-box">
+        <h2>Cupons de desconto (casos especiais, ex.: casal)</h2>
+        <div class="cupom-gerar">
+          <div class="cupom-tipo">
+            <label><input type="radio" name="cupTipo" value="pct" checked> Percentual (%)</label>
+            <label><input type="radio" name="cupTipo" value="valor"> Valor fixo (R$)</label>
+          </div>
+          <div class="cupom-campos">
+            <input type="number" id="cupValor" placeholder="Ex.: 30 (ou 82.50)" step="0.01" min="0">
+            <input type="text" id="cupLabel" placeholder="Rótulo (opcional) — ex.: CASAL" maxlength="12" style="text-transform:uppercase">
+            <button class="btn-cupom" onclick="gerarCupom()">Gerar cupom</button>
+          </div>
+          <div id="cupResult"></div>
+        </div>
+        <div class="cupom-gerar" style="margin-top:14px">
+          <h3 style="margin:0 0 6px">Venda reservada (link direto)</h3>
+          <p class="muted small" style="margin:0 0 10px">Reserva vagas de uma turma para uma pessoa. Enquanto a reserva estiver ativa, o site mostra a turma cheia para o público — só quem tem o link compra.</p>
+          <div class="cupom-campos">
+            <select id="resCurso">
+              <option value="Pão">Pão</option>
+              <option value="Pizza">Pizza</option>
+            </select>
+            <input type="text" id="resData" placeholder="Data — ex.: 29/08/2026">
+            <input type="number" id="resVagas" value="1" min="1" max="4" style="flex:0 0 90px">
+            <input type="number" id="resDesconto" value="0" min="0" max="100" style="flex:0 0 90px" title="Desconto em %">
+            <input type="text" id="resRotulo" placeholder="Quem? (ex.: KÁTIA)" maxlength="6" style="text-transform:uppercase">
+            <button class="btn-cupom" onclick="gerarReserva()">Gerar link de reserva</button>
+          </div>
+          <div class="small muted" style="margin-top:6px">Desconto em % (0 = sem desconto). Vagas = quantas pessoas esse link libera.</div>
+          <div id="resResult"></div>
+        </div>
+        <table id="tblCupons" style="margin-top:14px">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Desconto</th>
+              <th>Status</th>
+              <th>Usado em</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyCupons">
+            <tr><td colspan="5" class="empty">Nenhum cupom ainda.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="turmas-box">
+        <h2>Lista de espera por curso (💬 Chamar = abrir WhatsApp direto com a pessoa)</h2>
+        <div class="filters" style="margin-bottom:10px">
+          <span class="muted small" id="esperaCount"></span>
+          <select id="fEsperaCurso">
+            <option value="">Todos os cursos</option>
+            <option value="Pão">Curso de Pão</option>
+            <option value="Pizza">Curso de Pizza</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Curso</th>
+              <th>Contato</th>
+              <th>Registrado</th>
+              <th>Notificado</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyEspera">
+            <tr><td colspan="6" class="empty">Ninguém na lista de espera ainda.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="small muted mt">
+        Dica: preencha o link do grupo na aba "Turmas" da planilha e rode o menu
+        <strong>Pão de Verdade → Enviar convites de grupos</strong> para mandar o convite
+        a todos os pagos daquela turma de uma vez. Use <strong>⚙️ Gerenciar</strong> em cada
+        linha para ver detalhes, editar, anotar, reenviar acesso ou convite, marcar como
+        concluído e excluir.
+      </p>
+
+      <div class="turmas-box">
+        <h2>Interruptores de recursos</h2>
+        <p class="small muted">Ligue ou desligue cada funcionalidade. Tudo começa ligado — desligar desativa na hora (site e backend).</p>
+        <div id="interruptores"></div>
+      </div>
+
+      <div class="turmas-box">
+        <h2>Lembretes agendados (e-mail e/ou WhatsApp)</h2>
+        <p class="small muted">O executor roda todo dia às 9h (trigger) e no botão "Executar agora". Variáveis na mensagem: <strong>{nome} {curso} {data} {codigo} {titulo}</strong>.</p>
+        <div class="cupom-gerar">
+          <div class="cupom-tipo">
+            <label>Público
+              <select class="edit" id="lemTipo" style="width:auto">
+                <option value="credito">Crédito (quem tem crédito + turma com vaga)</option>
+                <option value="turma">Inscritos pagos da turma</option>
+              </select>
+            </label>
+            <label>Canal
+              <select class="edit" id="lemCanal" style="width:auto">
+                <option value="email">E-mail</option>
+                <option value="zap">WhatsApp (ponte Baileys)</option>
+                <option value="ambos">Ambos</option>
+              </select>
+            </label>
+            <label>Curso
+              <select class="edit" id="lemCurso" style="width:auto">
+                <option value="Ambos">Pão e Pizza</option>
+                <option value="Pão">Pão</option>
+                <option value="Pizza">Pizza</option>
+              </select>
+            </label>
+            <label>Dias antes
+              <input class="edit" type="number" id="lemDias" value="1" min="0" style="width:80px">
+            </label>
+          </div>
+          <input class="edit" type="text" id="lemTitulo" placeholder="Título (ex.: Lembrete de crédito)" autocomplete="off">
+          <textarea class="edit" id="lemMsg" rows="3" placeholder="Mensagem… Ex.: Oi {nome}! A turma de {curso} · {data} ainda tem vaga. Seu crédito {codigo} está te esperando."></textarea>
+          <div style="margin-top:8px">
+            <button class="btn-cupom" onclick="criarLembrete()">Agendar lembrete</button>
+            <button class="btn-cupom" style="margin-left:8px" onclick="executarLembretesAgora()">▶ Executar agora</button>
+          </div>
+          <div id="lemResult"></div>
+        </div>
+        <table id="tblLembretes" style="margin-top:14px">
+          <thead>
+            <tr>
+              <th>Título</th><th>Público</th><th>Canal</th><th>Curso</th><th>Dias antes</th><th>Ativo</th><th>Último envio</th><th>Ação</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyLembretes">
+            <tr><td colspan="8" class="empty">Nenhum lembrete agendado.</td></tr>
+          </tbody>
+        </table>
+        <p class="small muted mt">WhatsApp usa uma ponte Baileys (Node) — configure <strong>WHATSAPP_BRIDGE_URL</strong> e <strong>BRIDGE_TOKEN</strong> em Configurações da planilha (Script Properties).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="overlayGer" onclick="if(event.target===this)fechar('overlayGer')">
+    <div class="modal">
+      <button class="btn-close" onclick="fechar('overlayGer')">&times;</button>
+      <h3 id="gerTitulo"></h3>
+      <p class="sub" id="gerSub"></p>
+      <div class="modal-actions" id="gerAcoes"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="overlayDet" onclick="if(event.target===this)fechar('overlayDet')">
+    <div class="modal">
+      <button class="btn-close" onclick="fechar('overlayDet')">&times;</button>
+      <h3 id="detTitulo"></h3>
+      <p class="sub">Detalhes da inscrição</p>
+      <div id="detCorpo"></div>
+      <button class="btn-primary-modal" onclick="fechar('overlayDet')">Fechar</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="overlayEd" onclick="if(event.target===this)fechar('overlayEd')">
+    <div class="modal">
+      <button class="btn-close" onclick="fechar('overlayEd')">&times;</button>
+      <h3 id="edTitulo"></h3>
+      <p class="sub">Edite os dados e a anotação da inscrição.</p>
+      <input type="hidden" id="edId">
+      <label class="form-label" for="edNome">Nome</label>
+      <input class="edit" id="edNome" autocomplete="off">
+      <label class="form-label" for="edWhats">WhatsApp</label>
+      <input class="edit" id="edWhats" autocomplete="off">
+      <label class="form-label" for="edEmail">E-mail</label>
+      <input class="edit" id="edEmail" autocomplete="off">
+      <label class="form-label" for="edAnot">Anotação (só você vê)</label>
+      <textarea class="edit" id="edAnot"></textarea>
+      <button class="btn-primary-modal" onclick="salvarEdicao()">Salvar alterações</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="overlayGp" onclick="if(event.target===this)fechar('overlayGp')">
+    <div class="modal">
+      <button class="btn-close" onclick="fechar('overlayGp')">&times;</button>
+      <h3 id="gpTitulo"></h3>
+      <p class="sub" id="gpSub"></p>
+      <div class="modal-actions" id="gpAcoes"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="overlayDp" onclick="if(event.target===this)fechar('overlayDp')">
+    <div class="modal">
+      <button class="btn-close" onclick="fechar('overlayDp')">&times;</button>
+      <h3 id="dpTitulo"></h3>
+      <p class="sub">Detalhes do pedido</p>
+      <div id="dpCorpo"></div>
+      <button class="btn-primary-modal" onclick="fechar('overlayDp')">Fechar</button>
+    </div>
+  </div>
+
+  <script>
+    var ENDPOINT = 'https://script.google.com/macros/s/AKfycbxHyN1-ZU49ZH4wU92MHw8PlgLayxVSiszJ7iGG47jdampR5CrTDK2hmo4OH0koPaKRtQ/exec';
+    var dados = { inscritos: [], turmas: [], pedidos: [] };
+    var callbackSeq = 0;
+
+    function getSenha() {
+      try { return sessionStorage.getItem('pdv_senha') || ''; } catch (e) { return ''; }
+    }
+    function setSenha(v) {
+      try { sessionStorage.setItem('pdv_senha', v); } catch (e) {}
+    }
+    function clearSenha() {
+      try { sessionStorage.removeItem('pdv_senha'); } catch (e) {}
+    }
+
+    function req(params, cb) {
+      var id = 'pdvPanelCb' + (callbackSeq++);
+      var done = false;
+      window[id] = function (res) {
+        if (done) return;
+        done = true;
+        delete window[id];
+        cb(res);
+      };
+      var s = document.createElement('script');
+      s.onerror = function () {
+        if (done) return;
+        done = true;
+        delete window[id];
+        cb({ ok: false, erro: 'Falha de conexão com o servidor.' });
+      };
+      setTimeout(function () {
+        if (done) return;
+        done = true;
+        delete window[id];
+        cb({ ok: false, erro: 'Tempo esgotado ao carregar os dados.' });
+      }, 20000);
+      s.src = ENDPOINT + '?' + params + '&senha=' + encodeURIComponent(getSenha()) + '&callback=' + id;
+      document.body.appendChild(s);
+    }
+
+    function setLoading(on) {
+      var btn = document.getElementById('btnEntrar');
+      if (!btn) return;
+      btn.disabled = on;
+      btn.textContent = on ? 'Entrando…' : 'Entrar';
+    }
+
+    function showGateError(msg) {
+      document.getElementById('gateErr').textContent = msg || 'Não foi possível entrar.';
+      document.getElementById('gateErr').hidden = false;
+    }
+
+    function entrar() {
+      var v = document.getElementById('senhaInput').value.trim();
+      if (!v) return;
+      setSenha(v);
+      setLoading(true);
+      req('acao=dados', function (res) {
+        setLoading(false);
+        if (res && res.inscritos) { mostrar(res); return; }
+        clearSenha();
+        showGateError((res && res.erro) || 'Não foi possível carregar os dados.');
+        document.getElementById('senhaInput').value = '';
+      });
+    }
+
+    function mostrar(res) {
+      document.getElementById('gate').hidden = true;
+      document.getElementById('conteudo').hidden = false;
+      dados = res;
+      renderStats();
+      renderTabela();
+      renderTurmas();
+      renderPedidos();
+      renderCupons();
+      renderEspera();
+      renderConfig();
+      renderLembretes();
+    }
+
+    function sair() {
+      clearSenha();
+      location.reload();
+    }
+
+    function carregar() {
+      req('acao=dados', function (res) {
+        if (!res || !res.inscritos) {
+          document.getElementById('tbody').innerHTML = '<tr><td colspan="6" class="empty" style="color:#C62828">' + esc((res && res.erro) || 'Não foi possível carregar os dados.') + '</td></tr>';
+          return;
+        }
+        dados = res;
+        renderStats();
+        renderTabela();
+        renderTurmas();
+        renderPedidos();
+        renderCupons();
+        renderEspera();
+        renderConfig();
+        renderLembretes();
+      });
+    }
+
+    function renderStats() {
+      var pago = 0, aguardando = 0, creditos = 0;
+      dados.inscritos.forEach(function (i) {
+        if (i.status === 'pago') pago++;
+        else if (i.status === 'aguardando') aguardando++;
+        creditos += Number(i.credito) || 0;
+      });
+      (dados.pedidos || []).forEach(function (p) {
+        (p.pessoas || []).forEach(function (x) { creditos += Number(x.credito) || 0; });
+      });
+      document.getElementById('stPago').textContent = pago;
+      document.getElementById('stAguardando').textContent = aguardando;
+      document.getElementById('stTotal').textContent = dados.inscritos.length;
+      document.getElementById('stCreditos').textContent = 'R$ ' + creditos.toFixed(2);
+    }
+
+    function badge(st) {
+      return '<span class="badge ' + (st || 'aguardando') + '">' + esc(st || 'aguardando') + '</span>';
+    }
+
+    function actBtn(label, onclick, tipo) {
+      var cls = tipo === 'red' ? ' btn-del' : (tipo === 'green' ? ' btn-confirm' : '');
+      return '<button class="btn-small' + cls + '" onclick="' + onclick + '">' + label + '</button>';
+    }
+
+    function acharInscrito(id) {
+      for (var i = 0; i < dados.inscritos.length; i++) {
+        if (String(dados.inscritos[i].id) === String(id)) return dados.inscritos[i];
+      }
+      return null;
+    }
+    function acharPedido(pedido) {
+      for (var i = 0; i < (dados.pedidos || []).length; i++) {
+        if (String(dados.pedidos[i].pedido) === String(pedido)) return dados.pedidos[i];
+      }
+      return null;
+    }
+
+    function renderTabela() {
+      var curso = document.getElementById('fCurso').value;
+      var status = document.getElementById('fStatus').value;
+      var busca = document.getElementById('fBusca').value.trim().toLowerCase();
+      var rows = dados.inscritos.filter(function (i) {
+        if (curso && i.curso !== curso) return false;
+        if (status && i.status !== status) return false;
+        if (busca) {
+          var alvo = (i.nome + ' ' + i.whatsapp + ' ' + i.email).toLowerCase();
+          if (alvo.indexOf(busca) === -1) return false;
+        }
+        return true;
+      });
+
+      var tbody = document.getElementById('tbody');
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">Nenhum inscrito encontrado.</td></tr>';
+        return;
+      }
+
+      var html = '';
+      rows.forEach(function (i) {
+        var whatsNum = String(i.whatsapp || '').replace(/\D/g, '');
+        var contato = (whatsNum ? '<a href="https://wa.me/' + whatsNum + '" target="_blank" rel="noopener">' + esc(i.whatsapp) + '</a>' : '') +
+          (i.email ? '<br>' + esc(i.email) : '');
+        html += '<tr>' +
+          '<td><b>' + esc(i.nome) + '</b>' + (String(i.concluido) === 'sim' ? ' <span class="badge pago">✓</span>' : '') + '</td>' +
+          '<td>' + esc(i.curso) + '</td>' +
+          '<td>' + esc(i.dataTurma) + '</td>' +
+          '<td>' + badge(i.status) + '</td>' +
+          '<td class="small">' + contato + '</td>' +
+          '<td><button class="btn-small" onclick="ger(\'' + esc(i.id) + '\')">⚙️ Gerenciar</button></td>' +
+          '</tr>';
+      });
+      tbody.innerHTML = html;
+    }
+
+    function ger(id) {
+      var i = acharInscrito(id);
+      if (!i) return;
+      document.getElementById('gerTitulo').textContent = i.nome + ' — ' + (i.curso || '');
+      document.getElementById('gerSub').innerHTML = 'Turma ' + esc(i.dataTurma || '—') + ' · ' + badge(i.status) +
+        (String(i.concluido) === 'sim' ? ' · 🎓 concluído' : '') +
+        (Number(i.credito) > 0 ? ' · crédito R$ ' + (Number(i.credito)).toFixed(2) : '');
+      var acoes = '';
+      acoes += actBtn('👁 Ver detalhes', 'verDetalhes(\'' + esc(i.id) + '\')');
+      if (i.status === 'pago') {
+        acoes += actBtn('✉️ Reenviar acesso', 'reenviarAcesso(\'' + esc(i.id) + '\')');
+        acoes += actBtn('👥 Reenviar convite do grupo', 'reenviarConvite(\'' + esc(i.id) + '\')');
+        acoes += actBtn(String(i.concluido) === 'sim' ? '↩️ Desmarcar concluído' : '🎓 Marcar concluído', 'marcarConcluido(\'' + esc(i.id) + '\')');
+      } else {
+        acoes += actBtn('✓ Confirmar pagamento', 'confirmar(\'' + esc(i.id) + '\')', 'green');
+      }
+      acoes += actBtn('✏️ Editar dados / anotação', 'abrirEditar(\'' + esc(i.id) + '\')');
+      acoes += actBtn('🗑 Excluir inscrição', 'excluir(\'' + esc(i.id) + '\')', 'red');
+      document.getElementById('gerAcoes').innerHTML = acoes;
+      abrir('overlayGer');
+    }
+
+    function verDetalhes(id) {
+      var i = acharInscrito(id);
+      if (!i) return;
+      var linhas = [
+        ['Nome', i.nome], ['WhatsApp', i.whatsapp], ['E-mail', i.email],
+        ['Curso', i.curso], ['Turma', i.dataTurma], ['Valor', 'R$ ' + (Number(i.valor) || 0).toFixed(2)],
+        ['Status', i.status], ['Convite do grupo enviado', i.linkEnviado],
+        ['Concluído', i.concluido], ['Código de convite', i.codigoConvite],
+        ['Crédito', 'R$ ' + (Number(i.credito) || 0).toFixed(2)],
+        ['Pedido', i.pedidoId], ['Pessoa', i.pessoaId], ['Registro', i.registro]
+      ];
+      var html = linhas.map(function (r) {
+        return '<div class="row"><b>' + esc(r[0]) + '</b><span>' + esc(r[1] || '—') + '</span></div>';
+      }).join('');
+      if (i.anotacao) html += '<div class="row"><b>Anotação</b><span>' + esc(i.anotacao) + '</span></div>';
+      document.getElementById('detTitulo').textContent = i.nome;
+      document.getElementById('detCorpo').innerHTML = html;
+      abrir('overlayDet');
+    }
+
+    function abrirEditar(id) {
+      var i = acharInscrito(id);
+      if (!i) return;
+      document.getElementById('edId').value = i.id;
+      document.getElementById('edNome').value = i.nome || '';
+      document.getElementById('edWhats').value = i.whatsapp || '';
+      document.getElementById('edEmail').value = i.email || '';
+      document.getElementById('edAnot').value = i.anotacao || '';
+      document.getElementById('edTitulo').textContent = 'Editar — ' + i.nome;
+      abrir('overlayEd');
+    }
+
+    function salvarEdicao() {
+      var id = document.getElementById('edId').value;
+      var p = 'acao=atualizar&id=' + encodeURIComponent(id) +
+        '&nome=' + encodeURIComponent(document.getElementById('edNome').value) +
+        '&whatsapp=' + encodeURIComponent(document.getElementById('edWhats').value) +
+        '&email=' + encodeURIComponent(document.getElementById('edEmail').value) +
+        '&anotacao=' + encodeURIComponent(document.getElementById('edAnot').value);
+      req(p, function (res) {
+        if (!res || !res.ok) { window.alert((res && res.erro) || 'Não foi possível salvar.'); return; }
+        fechar('overlayEd');
+        fechar('overlayGer');
+        carregar();
+      });
+    }
+
+    function confirmar(id) {
+      if (!window.confirm('Confirmar o pagamento desta inscrição? O aluno receberá o acesso por e-mail.')) return;
+      req('acao=confirmar&id=' + encodeURIComponent(id), function (res) {
+        if (!res || !res.ok) {
+          window.alert((res && res.erro) || 'Não foi possível confirmar o pagamento.');
+          return;
+        }
+        window.alert('Pagamento confirmado. Acesso enviado por e-mail.');
+        fechar('overlayGer');
+        carregar();
+      });
+    }
+
+    function reenviarAcesso(id) {
+      if (!window.confirm('Gerar um novo link e enviar por e-mail? O link anterior deixará de funcionar.')) return;
+      req('acao=regenerar&id=' + encodeURIComponent(id), function (res) {
+        if (!res || !res.ok) {
+          window.alert((res && res.erro) || 'Não foi possível gerar o acesso.');
+          return;
+        }
+        window.alert('Novo acesso enviado por e-mail.');
+        fechar('overlayGer');
+        carregar();
+      });
+    }
+
+    function reenviarConvite(id) {
+      if (!window.confirm('Reenviar o convite do grupo por e-mail?')) return;
+      req('acao=reenviarconvite&id=' + encodeURIComponent(id), function (res) {
+        if (!res || !res.ok) {
+          window.alert((res && res.erro) || 'Não foi possível enviar o convite.');
+          return;
+        }
+        window.alert('Convite do grupo reenviado por e-mail.');
+        fechar('overlayGer');
+        carregar();
+      });
+    }
+
+    function marcarConcluido(id) {
+      req('acao=concluido&id=' + encodeURIComponent(id), function (res) {
+        if (!res || !res.ok) {
+          window.alert((res && res.erro) || 'Não foi possível atualizar.');
+          return;
+        }
+        fechar('overlayGer');
+        carregar();
+      });
+    }
+
+    function excluir(id) {
+      if (!window.confirm('Excluir esta inscrição? Essa ação não pode ser desfeita.')) return;
+      req('acao=excluir&id=' + encodeURIComponent(id), function (res) {
+        if (!res || !res.ok) {
+          window.alert((res && res.erro) || 'Não foi possível excluir.');
+          return;
+        }
+        fechar('overlayGer');
+        carregar();
+      });
+    }
+
+    function renderTurmas() {
+      var el = document.getElementById('turmas');
+      if (!dados.turmas.length) {
+        el.innerHTML = '<div class="muted small">Nenhuma turma cadastrada. Adicione turmas na aba "Turmas" da planilha.</div>';
+        return;
+      }
+      var html = '';
+      dados.turmas.forEach(function (t) {
+        var ocupadas = Number(t.ocupadas) || 0;
+        var vagas = Number(t.vagas) || 10;
+        var restantes = Math.max(0, vagas - ocupadas);
+        var ocupPill = t.cheia
+          ? '<span class="pill" style="background:#FFEBEE;color:#C62828">cheia</span>'
+          : '<span class="pill' + (restantes <= 3 ? ' amber' : '') + '">' + ocupadas + '/' + vagas + ' · ' + restantes + ' restante' + (restantes === 1 ? '' : 's') + '</span>';
+        var linkPill = t.linkGrupo
+          ? '<span class="pill green">link pronto</span>'
+          : '<span class="pill amber">sem link</span>';
+        html += '<div class="turma-item">' +
+          '<b>' + esc(t.curso) + '</b>' +
+          '<span class="muted">' + esc(t.dataTurma) + '</span>' +
+          '<span class="pills">' + ocupPill + linkPill +
+          '<button class="btn-small" onclick="ajustarVagas(\'' + esc(t.curso) + '\',\'' + esc(t.dataTurma) + '\',' + vagas + ')">🎚 Vagas</button>' +
+          '</span></div>';
+      });
+      el.innerHTML = html;
+    }
+
+    function ajustarVagas(curso, data, atual) {
+      var novo = window.prompt('Vagas da turma ' + curso + ' (' + data + ') — total:', atual);
+      if (novo == null) return;
+      novo = String(novo).replace(/\D/g, '');
+      if (!novo) return;
+      req('acao=setarvagas&curso=' + encodeURIComponent(curso) + '&dataTurma=' + encodeURIComponent(data) + '&vagas=' + novo, function (res) {
+        if (!res || !res.ok) { window.alert((res && res.erro) || 'Não foi possível salvar.'); return; }
+        carregar();
+      });
+    }
+
+    function escQ(s) {
+      return esc(s).replace(/'/g, "\\'");
+    }
+
+    function renderEspera() {
+      var el = document.getElementById('tbodyEspera');
+      var espera = dados.listaEspera || [];
+      var filtro = document.getElementById('fEsperaCurso').value;
+      if (filtro) espera = espera.filter(function (e) { return e.curso === filtro; });
+      var cont = document.getElementById('esperaCount');
+      if (cont) cont.textContent = espera.length + ' na lista de espera';
+      if (!espera.length) {
+        el.innerHTML = '<tr><td colspan="6" class="empty">Ninguém na lista de espera ainda.</td></tr>';
+        return;
+      }
+      var html = '';
+      espera.forEach(function (e) {
+        var w = String(e.whatsapp || '').replace(/\D/g, '');
+        var waLink = w ? '<a href="https://wa.me/' + w + '" target="_blank" rel="noopener">' + esc(e.whatsapp) + '</a>' : (e.email ? esc(e.email) : '—');
+        var notif = e.notificado === 'sim' ? '<span class="badge pago">aviso enviado</span>' : '<span class="badge aguardando">a avisar</span>';
+        var exportar = w
+          ? '<button class="btn-small" onclick="chamarEspera(\'' + escQ(e.nome) + '\',\'' + e.linha + '\')">💬 Chamar</button>'
+          : '';
+        html += '<tr>' +
+          '<td><b>' + esc(e.nome) + '</b></td>' +
+          '<td>' + esc(e.curso) + '</td>' +
+          '<td>' + waLink + '</td>' +
+          '<td class="small muted">' + (e.criadoEm ? esc(e.criadoEm) : '—') + '</td>' +
+          '<td>' + notif + '</td>' +
+          '<td>' + exportar +
+          '<button class="btn-small btn-del" onclick="excluirEspera(' + e.linha + ')">🗑</button></td>' +
+          '</tr>';
+      });
+      el.innerHTML = html;
+    }
+
+    function chamarEspera(nome, linha) {
+      var e = (dados.listaEspera || []).find(function (x) { return String(x.linha) === String(linha); });
+      if (!e) return;
+      var w = String(e.whatsapp || '').replace(/\D/g, '');
+      if (!w) { window.alert('Sem WhatsApp para chamar — use o e-mail ' + (e.email || '—') + '.'); return; }
+      var msg = encodeURIComponent('Oi ' + nome + '! Abriu vaga na oficina de ' + e.curso + ' do Pão de Verdade. Quer garantir?');
+      window.open('https://wa.me/' + w + '?text=' + msg, '_blank');
+    }
+
+    function excluirEspera(linha) {
+      if (!window.confirm('Remover da lista de espera?')) return;
+      req('acao=excluirespera&id=' + linha, function (res) {
+        if (!res || !res.ok) { window.alert((res && res.erro) || 'Não foi possível remover.'); return; }
+        carregar();
+      });
+    }
+
+    function renderPedidos() {
+      var el = document.getElementById('tbodyPedidos');
+      if (!dados.pedidos || !dados.pedidos.length) {
+        el.innerHTML = '<tr><td colspan="8" class="empty">Nenhum pedido ainda.</td></tr>';
+        return;
+      }
+      var html = '';
+      dados.pedidos.forEach(function (p) {
+        var pessoas = (p.pessoas || []).map(function (x) {
+          var w = String(x.whats || '').replace(/\D/g, '');
+          var link = w ? '<a href="https://wa.me/' + w + '" target="_blank" rel="noopener">' + esc(x.whats) + '</a>' : '';
+          return '<b>' + esc(x.nome) + '</b> (' + esc(x.cursos || '') + ')' +
+            (link ? '<br>' + link : '') +
+            (x.email ? '<br>' + esc(x.email) : '') +
+            (Number(x.credito) > 0 ? '<br><span class="muted small">crédito R$ ' + (Number(x.credito)).toFixed(2) + '</span>' : '');
+        }).join('<div class="pdv-sep"></div>');
+        html += '<tr>' +
+          '<td>' + esc(p.pedido) + '</td>' +
+          '<td>' + badge(p.status) + '</td>' +
+          '<td>' + pessoas + '</td>' +
+          '<td>R$ ' + (Number(p.bruto) || 0).toFixed(2) + '</td>' +
+          '<td>R$ ' + (Number(p.desconto) || 0).toFixed(2) + '</td>' +
+          '<td><b>R$ ' + (Number(p.total) || 0).toFixed(2) + '</b></td>' +
+          '<td>' + esc(p.forma || '') + '</td>' +
+          '<td><button class="btn-small" onclick="gerPedido(\'' + esc(p.pedido) + '\')">⚙️ Gerenciar</button></td>' +
+          '</tr>';
+      });
+      el.innerHTML = html;
+    }
+
+    function gerPedido(pedido) {
+      var p = acharPedido(pedido);
+      if (!p) return;
+      document.getElementById('gpTitulo').textContent = 'Pedido ' + p.pedido;
+      document.getElementById('gpSub').innerHTML = badge(p.status) + ' · <b>R$ ' + (Number(p.total) || 0).toFixed(2) + '</b>' +
+        (p.codigoUsado ? ' · código: ' + esc(p.codigoUsado) : '');
+      var acoes = '';
+      acoes += actBtn('👁 Ver detalhes', 'verDetalhesPedido(\'' + esc(p.pedido) + '\')');
+      if (String(p.status) !== 'pago') acoes += actBtn('✓ Confirmar pagamento', 'confirmarPedido(\'' + esc(p.pedido) + '\')', 'green');
+      acoes += actBtn('🗑 Excluir pedido', 'excluirPedido(\'' + esc(p.pedido) + '\')', 'red');
+      document.getElementById('gpAcoes').innerHTML = acoes;
+      abrir('overlayGp');
+    }
+
+    function verDetalhesPedido(pedido) {
+      var p = acharPedido(pedido);
+      if (!p) return;
+      var linhas = [
+        ['Status', p.status], ['Valor bruto', 'R$ ' + (Number(p.bruto) || 0).toFixed(2)],
+        ['Desconto', 'R$ ' + (Number(p.desconto) || 0).toFixed(2)],
+        ['Total', 'R$ ' + (Number(p.total) || 0).toFixed(2)],
+        ['Forma de pagamento', p.forma], ['Código usado', p.codigoUsado],
+        ['Registro', p.registro], ['Anotação', p.anotacao]
+      ];
+      var pessoasHtml = (p.pessoas || []).map(function (x) {
+        return '<div class="row"><b>' + esc(x.nome) + '</b><span>' + esc(x.cursos || '') + '</span></div>' +
+          '<div class="row"><b>Contato</b><span>' + esc(x.whats || '—') + (x.email ? ' · ' + esc(x.email) : '') + '</span></div>' +
+          '<div class="row"><b>Código convite</b><span>' + esc(x.codigoConvite || '—') + '</span></div>' +
+          '<div class="row"><b>Crédito</b><span>R$ ' + (Number(x.credito) || 0).toFixed(2) + '</span></div>' +
+          (x.anotacao ? '<div class="row"><b>Anotação</b><span>' + esc(x.anotacao) + '</span></div>' : '');
+      }).join('');
+      document.getElementById('dpTitulo').textContent = 'Pedido ' + p.pedido;
+      document.getElementById('dpCorpo').innerHTML = linhas.map(function (r) {
+        return '<div class="row"><b>' + esc(r[0]) + '</b><span>' + esc(r[1] || '—') + '</span></div>';
+      }).join('') + '<p class="form-label">Pessoas</p>' + pessoasHtml;
+      abrir('overlayDp');
+    }
+
+    function confirmarPedido(id) {
+      if (!window.confirm('Confirmar o pagamento deste pedido? As pessoas receberão o acesso por e-mail.')) return;
+      req('acao=confirmarpedido&pedido=' + encodeURIComponent(id), function (res) {
+        if (!res || !res.ok) {
+          window.alert((res && res.erro) || 'Não foi possível confirmar.');
+          return;
+        }
+        window.alert('Pedido confirmado. Acessos enviados por e-mail.');
+        fechar('overlayGp');
+        carregar();
+      });
+    }
+
+    function excluirPedido(id) {
+      if (!window.confirm('Excluir este pedido (todas as pessoas e itens)? Essa ação não pode ser desfeita.')) return;
+      req('acao=excluirpedido&pedido=' + encodeURIComponent(id), function (res) {
+        if (!res || !res.ok) {
+          window.alert((res && res.erro) || 'Não foi possível excluir.');
+          return;
+        }
+        fechar('overlayGp');
+        carregar();
+      });
+    }
+
+    function renderCupons() {
+      var el = document.getElementById('tbodyCupons');
+      var cupons = dados.cupons || [];
+      if (!cupons.length) {
+        el.innerHTML = '<tr><td colspan="5" class="empty">Nenhum cupom ainda.</td></tr>';
+        return;
+      }
+      var html = '';
+      cupons.forEach(function (c) {
+        var desc = '';
+        if (c.tipo === 'reserva') {
+          desc = 'Reserva · ' + esc((c.anotacao || c.codigo));
+        } else if (c.tipo === 'valor') {
+          desc = 'R$ ' + (Number(c.valor) || 0).toFixed(2);
+        } else {
+          desc = (Number(c.valor) || 0) + '%';
+        }
+        var stBadge = c.status === 'ativo'
+          ? '<span class="badge pago">ativo</span>'
+          : '<span class="badge recusado">' + esc(c.status || 'usado') + '</span>';
+        var acoes = '';
+        acoes += '<button class="btn-small" onclick="copiarCupom(\'' + esc(c.codigo) + '\')">📋 Copiar</button>';
+        if (String(c.status) !== 'ativo') {
+          acoes += '<button class="btn-small" onclick="reativarCupom(\'' + esc(c.codigo) + '\')">↩️ Reativar</button>';
+        }
+        acoes += '<button class="btn-small btn-del" onclick="excluirCupom(\'' + esc(c.codigo) + '\')">🗑</button>';
+        html += '<tr>' +
+          '<td class="cupom-code">' + esc(c.codigo) + '</td>' +
+          '<td>' + desc + '</td>' +
+          '<td>' + stBadge + '</td>' +
+          '<td class="small">' + (c.usadoEm ? esc(c.usadoEm) + (c.pedidoId ? '<br>' + esc(c.pedidoId) : '') : '—') + '</td>' +
+          '<td>' + acoes + '</td></tr>';
+      });
+      el.innerHTML = html;
+    }
+
+    function gerarCupom() {
+      var tipo = document.querySelector('input[name="cupTipo"]:checked').value;
+      var valor = document.getElementById('cupValor').value.trim();
+      var label = document.getElementById('cupLabel').value.trim();
+      if (!valor) { document.getElementById('cupResult').innerHTML = '<span style="color:var(--red)">Informe o valor do desconto.</span>'; return; }
+      req('acao=gerarcupom&tipo=' + encodeURIComponent(tipo) +
+        '&valor=' + encodeURIComponent(valor) +
+        '&label=' + encodeURIComponent(label), function (res) {
+        if (!res || !res.ok) {
+          document.getElementById('cupResult').innerHTML = '<span style="color:var(--red)">' + esc((res && res.erro) || 'Não foi possível gerar o cupom.') + '</span>';
+          return;
+        }
+        document.getElementById('cupResult').innerHTML =
+          'Cupom gerado: <span class="cupom-code">' + esc(res.codigo) + '</span> ' +
+          '<button class="btn-small" onclick="copiarCupom(\'' + esc(res.codigo) + '\')">📋 Copiar</button>' +
+          '<div class="small muted">Passe para o aluno usar no checkout (campo "Código de desconto").</div>';
+        document.getElementById('cupValor').value = '';
+        document.getElementById('cupLabel').value = '';
+        carregar();
+      });
+    }
+
+    function gerarReserva() {
+      var curso = document.getElementById('resCurso').value;
+      var data = document.getElementById('resData').value.trim();
+      var vagas = document.getElementById('resVagas').value.trim() || '1';
+      var desconto = document.getElementById('resDesconto').value.trim() || '0';
+      var rotulo = document.getElementById('resRotulo').value.trim();
+      var el = document.getElementById('resResult');
+      if (!data) { el.innerHTML = '<span style="color:var(--red)">Informe a data da turma (ex.: 29/08/2026).</span>'; return; }
+      req('acao=reservarvaga&curso=' + encodeURIComponent(curso) +
+        '&dataTurma=' + encodeURIComponent(data) +
+        '&vagas=' + encodeURIComponent(vagas) +
+        '&desconto=' + encodeURIComponent(desconto) +
+        '&rotulo=' + encodeURIComponent(rotulo), function (res) {
+        if (!res || !res.ok) {
+          el.innerHTML = '<span style="color:var(--red)">' + esc((res && res.erro) || 'Não foi possível criar a reserva.') + '</span>';
+          return;
+        }
+        var link = res.link || '';
+        el.innerHTML =
+          'Reserva criada: <span class="cupom-code">' + esc(res.codigo) + '</span> · ' + esc(res.vagas) + ' vaga(s) · ' + esc(res.curso) + ' ' + esc(res.dataTurma) +
+          (Number(res.desconto) > 0 ? ' · <b>' + esc(res.desconto) + '% de desconto</b>' : '') +
+          (res.rotulo ? ' · ' + esc(res.rotulo) : '') +
+          '<div style="margin-top:8px">Link da venda reservada:<br>' +
+          '<a href="' + esc(link) + '" target="_blank" rel="noopener" style="font-weight:700;text-decoration:underline;word-break:break-all">' + esc(link) + '</a></div>' +
+          '<button class="btn-small" style="margin-top:8px" onclick="copiarReservaLink(\'' + esc(link) + '\')">📋 Copiar link</button>' +
+          '<div class="small muted">Mande esse link só para a pessoa. Depois que ela comprar, a reserva é consumida automaticamente.</div>';
+        document.getElementById('resData').value = '';
+        document.getElementById('resRotulo').value = '';
+        document.getElementById('resDesconto').value = '0';
+        carregar();
+      });
+    }
+
+    function copiarReservaLink(link) {
+      var done = function (ok) {
+        if (ok) { window.alert('Link copiado!'); return; }
+        var ta = document.createElement('textarea');
+        ta.value = link;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); window.alert('Link copiado!'); } catch (e) {}
+        document.body.removeChild(ta);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(function () { done(true); }, function () { done(false); });
+      else done(false);
+    }
+
+    function copiarCupom(codigo) {
+      var done = function (ok) {
+        if (!ok) {
+          var ta = document.createElement('textarea');
+          ta.value = codigo;
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta);
+        }
+        window.alert('Cupom copiado: ' + codigo);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(codigo).then(function () { done(true); }, function () { done(false); });
+      } else {
+        done(false);
+      }
+    }
+
+    function reativarCupom(codigo) {
+      if (!window.confirm('Reativar o cupom ' + codigo + '?')) return;
+      req('acao=reativarcupom&codigo=' + encodeURIComponent(codigo), function (res) {
+        if (!res || !res.ok) { window.alert((res && res.erro) || 'Não foi possível reativar.'); return; }
+        carregar();
+      });
+    }
+
+    function excluirCupom(codigo) {
+      if (!window.confirm('Excluir o cupom ' + codigo + '?')) return;
+      req('acao=excluircupom&codigo=' + encodeURIComponent(codigo), function (res) {
+        if (!res || !res.ok) { window.alert((res && res.erro) || 'Não foi possível excluir.'); return; }
+        carregar();
+      });
+    }
+
+    function abrir(id) {
+      document.getElementById(id).style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function fechar(id) {
+      document.getElementById(id).style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    var FEATURES = [
+      { chave: 'lotada', nome: 'Trava de compra (TURMA LOTADA)', desc: 'Troca o botão de comprar por lista de espera quando a turma está cheia, em todo o site.' },
+      { chave: 'cancelamento', nome: 'Cancelamento fácil com crédito', desc: 'Botão "Cancelar e virar crédito" na Área do Estudante (janela de 5 dias) + cupom de crédito sem prazo.' },
+      { chave: 'lembrete', nome: 'Lembretes agendados / crédito', desc: 'Envios automáticos de e-mail/WhatsApp (roda no trigger diário e no botão "Executar agora").' },
+      { chave: 'crosssell', nome: 'Cross-sell na Área do Estudante', desc: 'Mostra o curso que falta (Pão ↔ Pizza) quando ainda tem vaga.' },
+      { chave: 'suporte', nome: 'Suporte WhatsApp flutuante', desc: 'Botão fixo "Suporte" na Área do Estudante.' }
+    ];
+
+    function renderConfig() {
+      var el = document.getElementById('interruptores');
+      if (!el) return;
+      var cfg = dados.config || {};
+      var html = '';
+      FEATURES.forEach(function (f) {
+        var on = cfg[f.chave] !== false;
+        html += '<label class="cupom-tipo" style="align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:6px 0;cursor:pointer">' +
+          '<input type="checkbox" ' + (on ? 'checked' : '') + ' onchange="setFeature(\'' + f.chave + '\', this.checked)">' +
+          '<span style="flex:1"><strong>' + esc(f.nome) + '</strong><br><span class="small muted">' + esc(f.desc) + '</span></span>' +
+          '<span class="badge ' + (on ? 'pago' : 'aguardando') + '">' + (on ? 'ligado' : 'desligado') + '</span>' +
+          '</label>';
+      });
+      el.innerHTML = html;
+    }
+
+    function setFeature(chave, ligado) {
+      req('acao=config&chave=FEATURE_' + encodeURIComponent(chave.toUpperCase()) + '&valor=' + (ligado ? 'ligado' : 'desligado'), function (res) {
+        if (!res || !res.ok) { window.alert((res && res.erro) || 'Não foi possível alterar.'); return; }
+        if (dados.config) dados.config[chave] = ligado;
+        renderConfig();
+      });
+    }
+
+    function renderLembretes() {
+      var tbody = document.getElementById('tbodyLembretes');
+      if (!tbody) return;
+      var l = (dados.lembretes || []);
+      if (!l.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty">Nenhum lembrete agendado.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = l.map(function (x) {
+        return '<tr>' +
+          '<td><strong>' + esc(x.titulo) + '</strong></td>' +
+          '<td>' + esc(x.tipo) + '</td>' +
+          '<td>' + esc(x.canal) + '</td>' +
+          '<td>' + esc(x.curso) + '</td>' +
+          '<td>' + (x.diasAntes || 0) + '</td>' +
+          '<td>' + (x.ativo ? '<span class="badge pago">ligado</span>' : '<span class="badge aguardando">desligado</span>') + '</td>' +
+          '<td class="small muted">' + esc(x.ultimoEnvio || '—') + '</td>' +
+          '<td>' +
+            '<button class="btn-small" onclick="alternarLembrete(\'' + esc(x.id) + '\',' + (x.ativo ? 0 : 1) + ')">' + (x.ativo ? 'Desligar' : 'Ligar') + '</button> ' +
+            '<button class="btn-small btn-del" onclick="excluirLembrete(\'' + esc(x.id) + '\')">Excluir</button>' +
+          '</td></tr>';
+      }).join('');
+    }
+
+    function criarLembrete() {
+      var titulo = document.getElementById('lemTitulo').value.trim();
+      var msg = document.getElementById('lemMsg').value.trim();
+      var tipo = document.getElementById('lemTipo').value;
+      var canal = document.getElementById('lemCanal').value;
+      var curso = document.getElementById('lemCurso').value;
+      var dias = document.getElementById('lemDias').value || '0';
+      var resEl = document.getElementById('lemResult');
+      req('acao=criarlembrete&titulo=' + encodeURIComponent(titulo) +
+        '&tipo=' + encodeURIComponent(tipo) +
+        '&canal=' + encodeURIComponent(canal) +
+        '&curso=' + encodeURIComponent(curso) +
+        '&diasAntes=' + encodeURIComponent(dias) +
+        '&mensagem=' + encodeURIComponent(msg), function (res) {
+        if (!res || !res.ok) {
+          resEl.innerHTML = '<span style="color:#C62828">' + esc((res && res.erro) || 'Não foi possível agendar.') + '</span>';
+          return;
+        }
+        resEl.innerHTML = '<span style="color:#2E7D32">Lembrete agendado!</span>';
+        document.getElementById('lemTitulo').value = '';
+        document.getElementById('lemMsg').value = '';
+        carregar();
+      });
+    }
+
+    function executarLembretesAgora() {
+      if (!window.confirm('Executar os lembretes ativos agora? Pode enviar e-mails/WhatsApp de verdade.')) return;
+      req('acao=executarlembretes', function (res) {
+        var el = document.getElementById('lemResult');
+        if (!res || !res.ok) { el.innerHTML = '<span style="color:#C62828">' + esc((res && res.erro) || 'Falha ao executar.') + '</span>'; return; }
+        el.innerHTML = '<span style="color:#2E7D32">Enviados: ' + Number(res.enviados || 0) + '</span>';
+        carregar();
+      });
+    }
+
+    function alternarLembrete(id, ativo) {
+      req('acao=alternarlembrete&id=' + encodeURIComponent(id) + '&ativo=' + (ativo ? '1' : '0'), function (res) {
+        if (!res || !res.ok) { window.alert((res && res.erro) || 'Não foi possível alternar.'); return; }
+        carregar();
+      });
+    }
+
+    function excluirLembrete(id) {
+      if (!window.confirm('Excluir este lembrete?')) return;
+      req('acao=excluirlembrete&id=' + encodeURIComponent(id), function (res) {
+        if (!res || !res.ok) { window.alert((res && res.erro) || 'Não foi possível excluir.'); return; }
+        carregar();
+      });
+    }
+
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    document.getElementById('fBusca').addEventListener('input', renderTabela);
+    document.getElementById('fCurso').addEventListener('change', renderTabela);
+    document.getElementById('fStatus').addEventListener('change', renderTabela);
+    document.getElementById('fEsperaCurso').addEventListener('change', renderEspera);
+
+    document.getElementById('senhaInput').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') entrar();
+    });
+
+    if (getSenha()) {
+      req('acao=dados', function (res) {
+        if (res && res.inscritos) { mostrar(res); }
+        else { document.getElementById('gate').hidden = false; document.getElementById('senhaInput').value = ''; }
+      });
+    } else {
+      document.getElementById('gate').hidden = false;
+    }
+  </script>
+</body>
+</html>
