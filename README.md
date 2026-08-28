@@ -34,4 +34,5 @@ tools/sync-upstream.ps1 + .github/workflows/sync-upstream.yml → sincronizaçã
 
 ## Deploy
 
-Hospedado no GitHub Pages: `https://alicegussoni.github.io/`
+Hospedado no GitHub Pages: `https://ferrarijonas.github.io/alicegussoni/`
+(ideal futuro: `alicegussoni.github.io` — criar o repo na conta `alicegussoni` do GitHub e re-apontar)
