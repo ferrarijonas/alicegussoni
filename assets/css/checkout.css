@@ -85,7 +85,7 @@ html{ overflow-x: hidden; }
 }
 .ck-vagas-status::before{ content: ''; width: 6px; height: 6px; border-radius: 50%; background: #B26A00; flex: 0 0 6px; }
 .ck-vagas-warn{ font-size: .82rem; font-weight: 700; color: #B26A00; margin-top: 8px; line-height: 1.35; }
-.ck-vagas-cheia{ font-size: .82rem; font-weight: 700; color: #C62828; margin-top: 8px; line-height: 1.35; }
+.ck-vagas-cheia{ font-size: .82rem; font-weight: 700; color: #A34A2F; margin-top: 8px; line-height: 1.35; }
 .ck-vagas-garantia{
   margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line);
   font-size: .78rem; color: var(--text-soft); line-height: 1.4;
@@ -103,7 +103,7 @@ html{ overflow-x: hidden; }
 .ck-qtd-title{ display: block; font-weight: 700; font-size: .95rem; color: var(--text); }
 .ck-qtd-price{ display: block; margin-top: 6px; font-family: var(--serif); color: var(--accent); font-weight: 700; font-size: 1.12rem; }
 .ck-qtd-price small{ font-family: var(--sans); color: var(--text-soft); font-weight: 600; font-size: .82rem; }
-.ck-badge-off{ background: #2E7D32; color: #fff; font-size: .68rem; padding: 2px 7px; border-radius: 999px; margin-left: 6px; vertical-align: middle; }
+.ck-badge-off{ background: #5C6B52; color: #fff; font-size: .68rem; padding: 2px 7px; border-radius: 999px; margin-left: 6px; vertical-align: middle; }
 
 /* pessoa card */
 .ck-pessoa{
@@ -131,12 +131,12 @@ html{ overflow-x: hidden; }
   transition: border-color .15s, box-shadow .15s;
 }
 .ck-field input:focus{ outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(74,46,27,.10); }
-.ck-field input.is-invalid{ border-color: #C62828; background: #FFEFF0; }
-.ck-field input.is-valid{ border-color: #2E7D32; background: #F0F7F0; }
+.ck-field input.is-invalid{ border-color: #A34A2F; background: #F7E9E4; }
+.ck-field input.is-valid{ border-color: #5C6B52; background: #EEF1EB; }
 .ck-hint{ display: block; margin-top: 6px; font-size: .8rem; color: var(--text-soft); }
-.ck-hint.err{ color: #C62828; font-weight: 600; }
-.ck-hint.ok{ color: #2E7D32; font-weight: 600; }
-.ck-req{ color: #C62828; }
+.ck-hint.err{ color: #A34A2F; font-weight: 600; }
+.ck-hint.ok{ color: #5C6B52; font-weight: 600; }
+.ck-req{ color: #A34A2F; }
 
 /* cursos — exatamente 2 linhas, simples e robusto */
 .ck-cursos{ display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
@@ -194,8 +194,8 @@ html{ overflow-x: hidden; }
 .ck-code-row{ display: flex; gap: 10px; align-items: center; }
 .ck-code-row input{ flex: 1; text-transform: uppercase; letter-spacing: .04em; }
 .ck-code-hint{ min-width: 140px; font-size: .82rem; font-weight: 700; }
-.ck-code-hint.ok{ color: #2E7D32; }
-.ck-code-hint.err{ color: #C62828; }
+.ck-code-hint.ok{ color: #5C6B52; }
+.ck-code-hint.err{ color: #A34A2F; }
 
 /* trust — compacto, 2 linhas máx */
 .ck-trust{ margin-top: 16px; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 8px; }
@@ -211,7 +211,7 @@ html{ overflow-x: hidden; }
 .ck-legal a{ text-decoration: underline; }
 
 /* erro global */
-.ck-erro{ margin-top: 14px; padding: 12px 14px; background: #FFEBEE; color: #C62828; border-radius: 10px; font-size: .92rem; font-weight: 600; }
+.ck-erro{ margin-top: 14px; padding: 12px 14px; background: #F7E9E4; color: #A34A2F; border-radius: 10px; font-size: .92rem; font-weight: 600; }
 
 /* actions */
 .ck-actions{ margin-top: 18px; }
@@ -221,7 +221,7 @@ html{ overflow-x: hidden; }
 
 /* resumo — linhas usadas no inline */
 .ck-resumo-linha{ display: flex; justify-content: space-between; gap: 10px; font-size: .92rem; padding: 4px 0; }
-.ck-resumo-desc{ color: #2E7D32; font-weight: 700; }
+.ck-resumo-desc{ color: #5C6B52; font-weight: 700; }
 .ck-resumo-total{ display: flex; justify-content: space-between; gap: 10px; font-weight: 800; font-size: 1.08rem; color: var(--accent); border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; }
 .ck-help-inline{ text-align: center; color: var(--text-soft); font-size: .86rem; margin-top: 14px; }
 .ck-help-inline a{ font-weight: 700; text-decoration: underline; color: var(--accent); }

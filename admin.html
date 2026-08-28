@@ -3,34 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel de Inscrições — Pão de Verdade</title>
+  <title>Painel de Inscrições — Alice Gussoni</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #FCFBF9;
-      --text: #212121;
-      --text-soft: #6E6A64;
-      --line: #E2DED7;
-      --accent: #4A2E1B;
-      --accent-soft: #EFEAE3;
-      --green: #2E7D32;
-      --amber: #B26A00;
-      --red: #C62828;
+      --bg: #F7F4EF;
+      --text: #664B38;
+      --text-soft: #9C8B7C;
+      --line: #E8E0D4;
+      --accent: #5B4432;
+      --accent-soft: #F0EAE0;
+      --green: #5C6B52;
+      --amber: #A37A3C;
+      --red: #A34A2F;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Open Sans', 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
-    header { background: #2B1910; color: #F3EDE3; padding: 18px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    body { font-family: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+    header { background: #3B2A1E; color: #F3EDE3; padding: 18px 28px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
     header .brand { display: flex; align-items: center; gap: 14px; }
     header .brand img { height: 44px; width: auto; }
-    header h1 { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 600; }
-    header h1 span { color: #E9B873; }
+    header h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.2rem; font-weight: 600; }
+    header h1 span { color: #AB9881; }
     header .hint { color: #D9CCB8; font-size: .82rem; }
     .wrap { max-width: 1100px; margin: 0 auto; padding: 28px; }
 
     .gate { max-width: 380px; margin: 60px auto; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 36px; box-shadow: 0 12px 34px rgba(33,33,33,.1); text-align: center; }
-    .gate h2 { font-family: 'Playfair Display', serif; margin-bottom: 6px; }
+    .gate h2 { font-family: 'Plus Jakarta Sans', sans-serif; margin-bottom: 6px; }
     .gate p { color: var(--text-soft); font-size: .9rem; margin-bottom: 18px; }
     .gate input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 14px; font-size: 1rem; }
     .gate button { width: 100%; padding: 13px; background: var(--text); color: #fff; border: none; border-radius: 999px; font-weight: 700; font-size: 1rem; cursor: pointer; }
@@ -38,7 +38,7 @@
 
     .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
     .stat { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 16px; text-align: center; }
-    .stat b { display: block; font-size: 1.8rem; font-family: Georgia, serif; }
+    .stat b { display: block; font-size: 1.8rem; font-family: 'Plus Jakarta Sans', sans-serif; }
     .stat span { color: var(--text-soft); font-size: .85rem; }
     .stat.pago b { color: var(--green); }
     .stat.aguardando b { color: var(--amber); }
@@ -111,8 +111,8 @@
 <body>
   <header>
     <div class="brand">
-      <img src="assets/img/marca-preta.png" alt="Pão de Verdade">
-      <h1>Pão de Verdade — <span>Painel de Inscrições</span></h1>
+      <img src="assets/img/logo-alice.webp" alt="Alice Gussoni">
+      <h1>Alice Gussoni — <span>Painel de Inscrições</span></h1>
     </div>
     <div class="hint">Atualizado em tempo real</div>
   </header>
@@ -137,9 +137,9 @@
       <div class="filters">
         <select id="fCurso">
           <option value="">Todos os cursos</option>
-          <option value="Pão">Curso de Pão</option>
-          <option value="Pizza">Curso de Pizza</option>
-          <option value="Pão + Pizza">Pão + Pizza</option>
+          <option value="Descoberta">Descoberta</option>
+          <option value="Imersão">Imersão</option>
+          <option value="Descoberta + Imersão">Descoberta + Imersão</option>
         </select>
         <select id="fStatus">
           <option value="">Todos os status</option>
@@ -213,8 +213,8 @@
           <p class="muted small" style="margin:0 0 10px">Reserva vagas de uma turma para uma pessoa. Enquanto a reserva estiver ativa, o site mostra a turma cheia para o público — só quem tem o link compra.</p>
           <div class="cupom-campos">
             <select id="resCurso">
-              <option value="Pão">Pão</option>
-              <option value="Pizza">Pizza</option>
+              <option value="Descoberta">Descoberta</option>
+              <option value="Imersão">Imersão</option>
             </select>
             <input type="text" id="resData" placeholder="Data — ex.: 29/08/2026">
             <input type="number" id="resVagas" value="1" min="1" max="4" style="flex:0 0 90px">
@@ -247,8 +247,8 @@
           <span class="muted small" id="esperaCount"></span>
           <select id="fEsperaCurso">
             <option value="">Todos os cursos</option>
-            <option value="Pão">Curso de Pão</option>
-            <option value="Pizza">Curso de Pizza</option>
+            <option value="Descoberta">Descoberta</option>
+            <option value="Imersão">Imersão</option>
           </select>
         </div>
         <table>
@@ -270,7 +270,7 @@
 
       <p class="small muted mt">
         Dica: preencha o link do grupo na aba "Turmas" da planilha e rode o menu
-        <strong>Pão de Verdade → Enviar convites de grupos</strong> para mandar o convite
+        <strong>Alice Gussoni → Enviar convites de grupos</strong> para mandar o convite
         a todos os pagos daquela turma de uma vez. Use <strong>⚙️ Gerenciar</strong> em cada
         linha para ver detalhes, editar, anotar, reenviar acesso ou convite, marcar como
         concluído e excluir.
@@ -302,9 +302,9 @@
             </label>
             <label>Curso
               <select class="edit" id="lemCurso" style="width:auto">
-                <option value="Ambos">Pão e Pizza</option>
-                <option value="Pão">Pão</option>
-                <option value="Pizza">Pizza</option>
+                <option value="Ambos">Descoberta e Imersão</option>
+                <option value="Descoberta">Descoberta</option>
+                <option value="Imersão">Imersão</option>
               </select>
             </label>
             <label>Dias antes
@@ -779,7 +779,7 @@
       if (!e) return;
       var w = String(e.whatsapp || '').replace(/\D/g, '');
       if (!w) { window.alert('Sem WhatsApp para chamar — use o e-mail ' + (e.email || '—') + '.'); return; }
-      var msg = encodeURIComponent('Oi ' + nome + '! Abriu vaga na oficina de ' + e.curso + ' do Pão de Verdade. Quer garantir?');
+      var msg = encodeURIComponent('Oi ' + nome + '! Abriu vaga na vivência de ' + e.curso + ' do Studio Alice. Quer garantir?');
       window.open('https://wa.me/' + w + '?text=' + msg, '_blank');
     }
 
@@ -1037,7 +1037,7 @@
       { chave: 'lotada', nome: 'Trava de compra (TURMA LOTADA)', desc: 'Troca o botão de comprar por lista de espera quando a turma está cheia, em todo o site.' },
       { chave: 'cancelamento', nome: 'Cancelamento fácil com crédito', desc: 'Botão "Cancelar e virar crédito" na Área do Estudante (janela de 5 dias) + cupom de crédito sem prazo.' },
       { chave: 'lembrete', nome: 'Lembretes agendados / crédito', desc: 'Envios automáticos de e-mail/WhatsApp (roda no trigger diário e no botão "Executar agora").' },
-      { chave: 'crosssell', nome: 'Cross-sell na Área do Estudante', desc: 'Mostra o curso que falta (Pão ↔ Pizza) quando ainda tem vaga.' },
+      { chave: 'crosssell', nome: 'Cross-sell na Área do Estudante', desc: 'Mostra o curso que falta (Descoberta ↔ Imersão) quando ainda tem vaga.' },
       { chave: 'suporte', nome: 'Suporte WhatsApp flutuante', desc: 'Botão fixo "Suporte" na Área do Estudante.' }
     ];
 

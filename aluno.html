@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Área do Estudante — Pão de Verdade</title>
+  <title>Área do Estudante — Alice Gussoni</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.min.css?v=1">
+  <script src="assets/js/inscricao-config.js"></script>
   <style>
     .student-page { min-height: 70vh; padding: 64px 24px 80px; }
     .student-back { color: var(--text-soft); font-size: .9rem; font-weight: 700; }
@@ -64,24 +68,24 @@
 <body>
   <header class="site-header">
       <div class="header-inner">
-      <a href="index.html" class="brand"><img src="assets/img/marca-preta.png" alt="Pão de Verdade — Forneria Artesanal"></a>
+      <a href="index.html" class="brand"><img src="assets/img/logo-alice.webp" alt="Alice Gussoni — Ateliê de Cerâmica"></a>
       <a href="index.html" class="student-back">Voltar ao site</a>
     </div>
   </header>
 
   <main class="student-page">
     <section class="student-card" id="studentCard">
-      <span class="kicker left">Pão de Verdade</span>
+      <span class="kicker left">Alice Gussoni</span>
       <h1>Área do Estudante</h1>
       <p class="intro">Carregando seus materiais…</p>
     </section>
   </main>
 
-  <footer class="site-footer"><div class="footer-inner"><div class="footer-bottom">© <span id="year"></span> Pão de Verdade. Todos os direitos reservados.</div></div></footer>
+  <footer class="site-footer"><div class="footer-inner"><div class="footer-bottom">© <span id="year"></span> Alice Gussoni. Todos os direitos reservados.</div></div></footer>
 
   <script>
     (function () {
-      var endpoint = 'https://script.google.com/macros/s/AKfycbxHyN1-ZU49ZH4wU92MHw8PlgLayxVSiszJ7iGG47jdampR5CrTDK2hmo4OH0koPaKRtQ/exec';
+      var endpoint = (typeof PDV_CONFIG !== 'undefined' && PDV_CONFIG.WEB_APP_URL) || '';
       var token = new URLSearchParams(window.location.search).get('token');
       var card = document.getElementById('studentCard');
       document.getElementById('year').textContent = new Date().getFullYear();
@@ -189,7 +193,7 @@
         var convite = aluno.codigoConvite || '';
         var credito = Number(aluno.credito || 0);
         if (convite) {
-          var msgConvite = 'Eu garanti minha vaga nas oficinas do Pão de Verdade! 🍞🍕 Use meu código de convite e ganhe 15% de desconto: ' + convite;
+          var msgConvite = 'Eu garanti minha vaga nas vivências do Studio Alice! 🎨 Use meu código de convite e ganhe 15% de desconto: ' + convite;
           html += '<section class="student-section">' +
             '<h2>Convidar alguém e ganhar 15%</h2>' +
             '<div class="student-feature"><div><h3>Leve alguém junto</h3><p>Quem usar o seu código ganha <strong>15% de desconto</strong> na inscrição. E você ganha <strong>15% de crédito</strong> para o seu próximo curso.</p></div></div>' +
@@ -261,8 +265,8 @@
         var inscritos = {};
         (aluno.cursos || []).forEach(function (c) { inscritos[norm(c.curso)] = true; });
         if (aluno.curso) inscritos[norm(aluno.curso)] = true;
-        if (inscritos['pao'] && inscritos['pizza']) return;
-        var alvo = inscritos['pao'] ? 'Pizza' : 'Pão';
+        if (inscritos['descoberta'] && inscritos['imersao']) return;
+        var alvo = inscritos['descoberta'] ? 'Imersão' : 'Descoberta';
         var t = null;
         for (var i = 0; i < turmas.length; i++) {
           if (norm(turmas[i].curso) !== norm(alvo)) continue;
@@ -271,12 +275,12 @@
           if (Number(turmas[i].restantes) > 0) { t = turmas[i]; break; }
         }
         if (!t) return;
-        var preco = 275;
+        var preco = alvo === 'Imersão' ? 600 : 350;
         var creditoTotal = Number(aluno.creditoValor || 0);
         var creditoConvite = Number(aluno.credito || 0);
-        var emoji = alvo === 'Pizza' ? '🍕' : '🍞';
+        var emoji = '🎨';
         var btnCheckout = 'checkout.html?curso=' + encodeURIComponent(alvo) + '&data=' + encodeURIComponent(t.dataTurma);
-        var htmlBlk = '<h2>' + emoji + ' ' + (alvo === 'Pizza' ? 'Pizza' : 'Pão') + ' ainda tem vaga</h2>' +
+        var htmlBlk = '<h2>' + emoji + ' ' + alvo + ' ainda tem vaga</h2>' +
           '<p>' + esc(t.dataTurma) + ' · <span class="preco">R$ ' + preco.toFixed(2) + '</span> por pessoa.</p>';
         if (creditoTotal >= preco) {
           htmlBlk += '<p style="color:#1B5E20;font-weight:700">Com seu crédito de R$ ' + creditoTotal.toFixed(2) + ', essa vaga sai de graça pra você.</p>';
@@ -286,8 +290,8 @@
           htmlBlk += '<p style="color:#1B5E20;font-weight:700">Seu crédito de convite de R$ ' + creditoConvite.toFixed(2) + ' é aplicado na hora de pagar.</p>';
         }
         htmlBlk += '<div class="btn-group mt-1">' +
-          '<a class="btn btn-primary" href="' + esc(btnCheckout) + '">Garantir vaga na ' + (alvo === 'Pizza' ? 'Pizza' : 'Pão') + ' →</a>' +
-          '<a class="btn btn-outline" href="' + (alvo === 'Pizza' ? 'curso-pizza.html' : 'curso-pao.html') + '?data=' + encodeURIComponent(t.dataTurma) + '">Ver curso →</a>' +
+          '<a class="btn btn-primary" href="' + esc(btnCheckout) + '">Garantir vaga na ' + alvo + ' →</a>' +
+          '<a class="btn btn-outline" href="' + (alvo === 'Imersão' ? 'curso-imersao.html' : 'curso-descoberta.html') + '?data=' + encodeURIComponent(t.dataTurma) + '">Ver curso →</a>' +
           '</div>';
         var blk2 = document.createElement('div');
         blk2.className = 'student-cross';
@@ -322,7 +326,7 @@
       }
 
       function renderLogin(msg) {
-        card.innerHTML = '<span class="kicker left">Pão de Verdade</span>' +
+        card.innerHTML = '<span class="kicker left">Alice Gussoni</span>' +
           '<h1>Área do Estudante</h1>' +
           '<p class="intro">Já garantiu sua vaga? Digite o e-mail ou WhatsApp que você usou na inscrição e receba seu acesso por e-mail.</p>' +
           '<label class="login-label" for="loginInput">E-mail ou WhatsApp</label>' +
@@ -408,7 +412,7 @@
   </script>
   <script>
     (function () {
-      var API = 'https://script.google.com/macros/s/AKfycbxHyN1-ZU49ZH4wU92MHw8PlgLayxVSiszJ7iGG47jdampR5CrTDK2hmo4OH0koPaKRtQ/exec';
+      var API = (typeof PDV_CONFIG !== 'undefined' && PDV_CONFIG.WEB_APP_URL) || '';
       var cbn = 'pdvSup' + Math.floor(Math.random() * 1e6);
       window[cbn] = function (res) { delete window[cbn]; if (res && res.suporte === false) return; montar(); };
       var s = document.createElement('script');
@@ -416,10 +420,10 @@
       s.src = API + '?acao=flags&callback=' + cbn;
       document.body.appendChild(s);
       function montar() {
-        var msg = 'Oi! Sou aluno do Pão de Verdade e preciso de ajuda na Área do Estudante.';
+        var msg = 'Oi! Sou aluno do Studio Alice e preciso de ajuda na Área do Estudante.';
         var a = document.createElement('a');
         a.className = 'student-support';
-        a.href = 'https://wa.me/5534936186847?text=' + encodeURIComponent(msg);
+        a.href = 'https://wa.me/' + ((typeof PDV_CONFIG !== 'undefined' && PDV_CONFIG.WHATSAPP) || '') + '?text=' + encodeURIComponent(msg);
         a.target = '_blank';
         a.rel = 'noopener';
         a.setAttribute('aria-label', 'Falar com suporte no WhatsApp');

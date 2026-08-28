@@ -3,27 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout — Pão de Verdade</title>
-  <meta name="description" content="Finalize sua inscrição na oficina de Pão ou Pizza artesanal. Pagamento seguro via Mercado Pago.">
+  <title>Checkout — Alice Gussoni</title>
+  <meta name="description" content="Finalize sua inscrição nas vivências de aquarela em cerâmica. Pagamento seguro via Mercado Pago.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.min.css?v=1">
   <link rel="stylesheet" href="assets/css/checkout.min.css?v=2">
-  <link rel="icon" type="image/png" href="assets/img/favicon.png?v=4">
+  <link rel="icon" type="image/webp" href="assets/img/logo-alice.webp">
 </head>
 <body class="checkout-body">
   <header class="site-header">
     <div class="header-inner">
       <a href="index.html" class="brand">
-        <img src="assets/img/marca-preta.png" alt="Pão de Verdade — Forneria Artesanal">
+        <img src="assets/img/logo-alice.webp" alt="Alice Gussoni — Ateliê de Cerâmica">
       </a>
       <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">☰</button>
       <nav class="main-nav" id="mainNav">
         <ul>
           <li><a href="index.html">Início</a></li>
-          <li><a href="curso-pao.html">Curso de Pão</a></li>
-          <li><a href="curso-pizza.html">Curso de Pizza</a></li>
+          <li><a href="curso-descoberta.html">Descoberta</a></li>
+          <li><a href="curso-imersao.html">Imersão</a></li>
           <li><a href="agenda.html">Agenda</a></li>
           <li><a href="perguntas.html">Perguntas Frequentes</a></li>
           <li><a href="quem-somos.html">Quem Somos</a></li>
@@ -60,11 +60,11 @@
             <div class="ck-qtd">
               <button type="button" class="ck-qtd-btn is-active" data-qtd="1" onclick="Checkout.setQtd(1)">
                 <span class="ck-qtd-title">Só eu</span>
-                <span class="ck-qtd-price">R$ 275</span>
+                <span class="ck-qtd-price">R$ 350 <small>· Descoberta</small></span>
               </button>
               <button type="button" class="ck-qtd-btn" data-qtd="2" onclick="Checkout.setQtd(2)">
                 <span class="ck-qtd-title">2 pessoas <span class="ck-badge-off">−15%</span></span>
-                <span class="ck-qtd-price">R$ 467,50 <small>· 2 × R$ 233,75</small></span>
+                <span class="ck-qtd-price">−15% <small>no total</small></span>
               </button>
             </div>
 
@@ -143,11 +143,12 @@
       <!-- compat: resumo legado oculto (mantido para JS) -->
       <div id="ckResumo" hidden aria-hidden="true"></div>
     </div>
-    <p class="ck-help-inline"><strong>Dúvidas?</strong> <a href="https://wa.me/5534936186847" target="_blank" rel="noopener">Fale no WhatsApp</a> — atendimento humano.</p>
+    <p class="ck-help-inline"><strong>Dúvidas?</strong> <a href="https://wa.me/" target="_blank" rel="noopener">Fale no WhatsApp</a> — atendimento humano.</p>
+    <!-- TODO: preencher link do WhatsApp da Alice -->
   </main>
 
   <footer class="checkout-footer">
-    <p>© Pão de Verdade — Forneria Artesanal · Rua Mário Pinto Sobrinho, 156 — Santa Mônica, Uberlândia · CNPJ 50.330.598/0001-55</p>
+    <p>© Alice Gussoni — Ateliê de Cerâmica · Studio Alice, Uberlândia/MG</p>
     <p class="checkout-footer-sub">Ambiente seguro e criptografado. Seus dados são protegidos pela LGPD.</p>
   </footer>
 

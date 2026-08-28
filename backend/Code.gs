@@ -1,5 +1,5 @@
 /* =========================================================
-   PÃO DE VERDADE — Backend de inscrições (Google Apps Script)
+   ALICE GUSSONI — Backend de inscrições (Google Apps Script)
    ---------------------------------------------------------
    O que faz:
    1. Recebe inscrição do site (formulário POST) e cria uma
@@ -19,7 +19,8 @@
 
 var PROPS = PropertiesService.getScriptProperties();
 var MP_API = 'https://api.mercadopago.com';
-var PRECO_OFICINA = 275;
+var PRECO_CURSO = { 'Descoberta': 350, 'Imersão': 600 };
+function precoCurso(c) { return PRECO_CURSO[normalizarCurso(c)] || 0; }
 
 /* Configuração com fallback embutido (não precisa de Script Properties) */
 function getMPToken() {
@@ -59,7 +60,7 @@ function configurarInicial() {
 
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
-  ui.createMenu('Pão de Verdade')
+  ui.createMenu('Alice Gussoni')
     .addItem('Enviar convites de grupos (pagos)', 'enviarConvites')
     .addItem('Regenerar acesso da Área do Aluno', 'regenerarAcessoPorEmail')
     .addItem('Criar abas da planilha', 'criarAbas')
@@ -398,12 +399,12 @@ function doGet(e) {
     }
     return ContentService.createTextOutput(
       '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">' +
-      '<meta http-equiv="refresh" content="3;url=https://ferrarijonas.github.io/paodeverdade/admin.html">' +
+      '<meta http-equiv="refresh" content="3;url=https://ferrarijonas.github.io/alicegussoni/admin.html">' +
       '<title>Painel atualizado</title></head>' +
       '<body style="font-family:Segoe UI,Arial,sans-serif;text-align:center;padding:60px;background:#F2F0EC;color:#212121">' +
       '<h1 style="color:#4A2E1B">Este painel antigo foi desativado.</h1>' +
       '<p style="color:#6E6A64">Use o novo painel de gestão. Redirecionando…</p>' +
-      '<p><a href="https://ferrarijonas.github.io/paodeverdade/admin.html" ' +
+      '<p><a href="https://ferrarijonas.github.io/alicegussoni/admin.html" ' +
       'style="display:inline-block;background:#212121;color:#fff;padding:14px 26px;border-radius:999px;text-decoration:none;font-weight:700">' +
       'Abrir o novo painel agora</a></p></body></html>'
     ).setMimeType(ContentService.MimeType.HTML);
@@ -411,7 +412,7 @@ function doGet(e) {
   return ContentService.createTextOutput(
     '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">' +
     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-    '<title>Pão de Verdade — Painel</title>' +
+    '<title>Alice Gussoni — Painel</title>' +
     '<style>body{font-family:Segoe UI,Arial,sans-serif;background:#F2F0EC;display:flex;' +
     'align-items:center;justify-content:center;min-height:100vh;margin:0;color:#212121}' +
     '.box{background:#fff;padding:40px;border-radius:12px;box-shadow:0 12px 34px rgba(33,33,33,.12);' +
@@ -498,7 +499,7 @@ function criarCheckout(d) {
   var email = (d.email || '').trim();
   var curso = (d.curso || '').trim();
   var dataTurma = (d.dataTurma || '').trim();
-  var valor = PRECO_OFICINA;
+  var valor = precoCurso(curso);
 
   if (!nome || !email) {
     return { ok: false, erro: 'Preencha nome e e-mail.' };
@@ -543,7 +544,7 @@ function inscreverManual(d) {
   var email = (d.email || '').trim();
   var curso = (d.curso || '').trim();
   var dataTurma = (d.dataTurma || '').trim();
-  var valor = PRECO_OFICINA;
+  var valor = precoCurso(curso);
 
   if (!nome || !email) {
     return { ok: false, erro: 'Preencha nome e e-mail.' };
@@ -583,7 +584,7 @@ function criarPixMP(d) {
   var email = (d.email || '').trim();
   var curso = (d.curso || '').trim();
   var dataTurma = (d.dataTurma || '').trim();
-  var valor = PRECO_OFICINA;
+  var valor = precoCurso(curso);
 
   if (!nome || !email) {
     return { ok: false, erro: 'Preencha nome e e-mail.' };
@@ -709,7 +710,7 @@ function criarPedido(d) {
     var sel = [];
     cursos.forEach(function (c) {
       var n = normalizarCurso(c);
-      if (n === 'Pão' || n === 'Pizza') sel.push(n);
+      if (n === 'Descoberta' || n === 'Imersão') sel.push(n);
     });
     if (!sel.length) return { ok: false, erro: 'Selecione ao menos um curso para cada pessoa.' };
     sel.forEach(function (c) {
@@ -717,7 +718,8 @@ function criarPedido(d) {
     });
   }
 
-  var bruto = itens.length * PRECO_OFICINA;
+  var bruto = 0;
+  itens.forEach(function (it) { bruto += precoCurso(it.curso); });
   var codigo = String(d.codigo || '').trim().toUpperCase();
   var desconto = 0;
   var total = bruto;
@@ -757,7 +759,7 @@ function criarPedido(d) {
   try { vlockOk = vlock.tryLock(20000); } catch (eL2) {}
   if (!vlockOk) { if (cid) soltarClaim(cid); return { ok: false, erro: 'Servidor ocupado. Tente novamente em instantes.' }; }
   try {
-    var descCalc = calcularDescontoPedido(itens.length, pessoas, codigo);
+    var descCalc = calcularDescontoPedido(itens.length, bruto, pessoas, codigo);
     if (descCalc.erro) { if (cid) soltarClaim(cid); return { ok: false, erro: descCalc.erro }; }
     desconto = descCalc.desconto || 0;
     total = Math.round((bruto - desconto) * 100) / 100;
@@ -808,7 +810,7 @@ function criarPedido(d) {
         if (it.pessoa !== p2) return;
         cursosDaPessoa.push(it.curso);
         var rowId = generateId(iSheet);
-        iSheet.appendRow([rowId, it.nome, it.whats, it.email, it.curso, dataTurma, PRECO_OFICINA, '', '', 'aguardando', 'não', formatDate(now), hashToken(areaToken), '', '', '', 'não', 'não', pedidoId, pessoaId, codigoConvite, 0, '', cpfNorm]);
+        iSheet.appendRow([rowId, it.nome, it.whats, it.email, it.curso, dataTurma, precoCurso(it.curso), '', '', 'aguardando', 'não', formatDate(now), hashToken(areaToken), '', '', '', 'não', 'não', pedidoId, pessoaId, codigoConvite, 0, '', cpfNorm]);
       });
       pesSheet.appendRow([pessoaId, pedidoId, String(pdata.nome || '').trim(), String(pdata.whatsapp || '').trim(), String(pdata.email || '').trim(), hashToken(areaToken), areaToken, cursosDaPessoa.join(', '), 'não', codigoConvite, 0, '', cpfNorm]);
       pessoasCriadas.push({ pessoaId: pessoaId, nome: String(pdata.nome || '').trim(), email: String(pdata.email || '').trim(), cursos: cursosDaPessoa });
@@ -862,10 +864,10 @@ function criarPreferenciaMPPedido(pedidoId, total, email) {
   var payload = {
     external_reference: pedidoId,
     notification_url: getWebAppUrl(),
-    statement_descriptor: 'PAO DE VERDADE',
-    items: [{ id: pedidoId, title: 'Oficinas Pão de Verdade', quantity: 1, unit_price: total, currency_id: 'BRL', category_id: 'course' }],
+    statement_descriptor: 'ALICE GUSSONI',
+    items: [{ id: pedidoId, title: 'Oficinas Alice Gussoni', quantity: 1, unit_price: total, currency_id: 'BRL', category_id: 'course' }],
     payer: { name: 'Cliente', email: email || 'sem@email.com' },
-    back_urls: { success: 'https://ferrarijonas.github.io/paodeverdade/checkout.html?pagamento=aprovado', pending: 'https://ferrarijonas.github.io/paodeverdade/checkout.html?pagamento=pendenciante', failure: 'https://ferrarijonas.github.io/paodeverdade/checkout.html?pagamento=recusado' },
+    back_urls: { success: 'https://ferrarijonas.github.io/alicegussoni/checkout.html?pagamento=aprovado', pending: 'https://ferrarijonas.github.io/alicegussoni/checkout.html?pagamento=pendenciante', failure: 'https://ferrarijonas.github.io/alicegussoni/checkout.html?pagamento=recusado' },
     auto_return: 'approved'
   };
   var res = UrlFetchApp.fetch(MP_API + '/checkout/preferences', {
@@ -885,7 +887,7 @@ function criarPixMPPedido(pedidoId, total, email) {
   if (!token) return { ok: false, erro: 'MP não configurado.' };
   var payload = {
     transaction_amount: total,
-    description: 'Oficinas Pão de Verdade',
+    description: 'Oficinas Alice Gussoni',
     payment_method_id: 'pix',
     external_reference: pedidoId,
     notification_url: getWebAppUrl(),
@@ -991,7 +993,7 @@ function cancelarPedidoComCredito(d) {
       var dTurma = new Date(Number(dp[2]), Number(dp[1]) - 1, Number(dp[0]));
       var limite = new Date(new Date().getTime() + 5 * 24 * 60 * 60 * 1000);
       if (isNaN(dTurma.getTime()) || dTurma.getTime() < limite.getTime()) {
-        return { ok: false, erro: 'Faltam menos de 5 dias para a oficina. Chama a gente no WhatsApp (34) 93618-6847 que resolvemos rapidinho.', janela: false };
+        return { ok: false, erro: 'Faltam menos de 5 dias para a oficina. Chama a gente no WhatsApp (34) 9XXXX-XXXX que resolvemos rapidinho.', janela: false };
       }
     }
   }
@@ -1108,14 +1110,14 @@ function enviarAcessoPessoa(pessoaId, pessoaRow) {
   var cursos = String(r[7] || '').trim();
   if (!email) return;
   if (String(r[8] || '').toLowerCase() === 'sim') return;
-  var link = 'https://ferrarijonas.github.io/paodeverdade/aluno.html?token=' + encodeURIComponent(token);
+  var link = 'https://ferrarijonas.github.io/alicegussoni/aluno.html?token=' + encodeURIComponent(token);
   var corpo = '<div style="font-family:Segoe UI,Arial,sans-serif;color:#212121;max-width:560px;margin:0 auto">' +
     '<h2 style="color:#4A2E1B">Oi, ' + esc(nome) + '!</h2>' +
     '<p>Sua inscrição foi confirmada' + (cursos ? ' nas oficinas de <strong>' + esc(cursos) + '</strong>' : '') + '.</p>' +
     '<p><a href="' + esc(link) + '" style="display:inline-block;background:#212121;color:#fff;padding:14px 26px;border-radius:999px;text-decoration:none;font-weight:700">Abrir minha Área do Estudante</a></p>' +
     '<p>Por lá você encontra os materiais, o link do grupo e, depois da oficina, o certificado.</p>' +
-    '<p style="color:#8A7A5C;font-size:.85rem">Pão de Verdade — Forneria Artesanal</p></div>';
-  GmailApp.sendEmail(email, 'Sua Área do Estudante — Pão de Verdade', 'Acesse sua Área do Estudante: ' + link, { htmlBody: corpo });
+    '<p style="color:#8A7A5C;font-size:.85rem">Alice Gussoni — Ateliê de Cerâmica</p></div>';
+  GmailApp.sendEmail(email, 'Sua Área do Estudante — Alice Gussoni', 'Acesse sua Área do Estudante: ' + link, { htmlBody: corpo });
   pesSheet.getRange(pessoaRow, 9).setValue('sim');
 }
 
@@ -1155,8 +1157,7 @@ function buscarConvite(codigo) {
   return null;
 }
 
-function calcularDescontoPedido(itens, pessoas, codigo) {
-  var bruto = itens * PRECO_OFICINA;
+function calcularDescontoPedido(itens, bruto, pessoas, codigo) {
   if (!codigo) {
     var d = itens >= 2 ? Math.round(bruto * 0.15 * 100) / 100 : 0;
     return { desconto: d, tipo: d ? 'duo' : '' };
@@ -1437,8 +1438,8 @@ function buscarContatoPorPedido(pedido) {
    --------------------------------------------------------- */
 function normCursoKey(v) {
   var s = String(v || '').toLowerCase().replace(/[àáâãä]/g, 'a').replace(/[óòôõö]/g, 'o');
-  if (s.indexOf('pizza') !== -1) return 'pizza';
-  if (s.indexOf('pao') !== -1) return 'pao';
+  if (s.indexOf('imers') !== -1) return 'imersao';
+  if (s.indexOf('descob') !== -1) return 'descoberta';
   return 'ambos';
 }
 
@@ -1505,7 +1506,7 @@ function preencherMsg(t, a) {
 
 function enviarEmailLembrete(email, msg, titulo) {
   try {
-    GmailApp.sendEmail(email, titulo || 'Pão de Verdade', msg);
+    GmailApp.sendEmail(email, titulo || 'Alice Gussoni', msg);
   } catch (e) { Logger.log('e-mail lembrete: ' + e); }
 }
 
@@ -1604,7 +1605,7 @@ function executarLembretes() {
   for (var i = 1; i < rows.length; i++) {
     if (String(rows[i][7] || '').trim().toLowerCase() !== 'sim') continue;
     var lemId = String(rows[i][0] || '');
-    var titulo = String(rows[i][1] || 'Pão de Verdade').trim();
+    var titulo = String(rows[i][1] || 'Alice Gussoni').trim();
     var tipo = String(rows[i][2] || 'credito').trim();
     var canal = String(rows[i][3] || 'email').trim();
     var curso = String(rows[i][4] || 'Ambos').trim();
@@ -1641,7 +1642,7 @@ function criarPreferenciaMP(info) {
   var token = getMPToken();
   if (!token) throw new Error('MP_ACCESS_TOKEN não configurado.');
 
-  var baseUrl = 'https://ferrarijonas.github.io/paodeverdade/';
+  var baseUrl = 'https://ferrarijonas.github.io/alicegussoni/';
   var titulo = 'Oficina de ' + info.curso +
     (info.dataTurma ? ' · ' + info.dataTurma : '') +
     ' — ' + info.nome;
@@ -1649,7 +1650,7 @@ function criarPreferenciaMP(info) {
   var payload = {
     external_reference: String(info.id),
     notification_url: getWebAppUrl(),
-    statement_descriptor: 'PAO DE VERDADE',
+    statement_descriptor: 'ALICE GUSSONI',
     items: [{
       id: String(info.id),
       title: titulo,
@@ -1743,14 +1744,14 @@ function enviarAcessoAluno(row) {
     sheet.getRange(row, 18).setValue(token);
   }
 
-  var link = 'https://ferrarijonas.github.io/paodeverdade/aluno.html?token=' + encodeURIComponent(token);
+  var link = 'https://ferrarijonas.github.io/alicegussoni/aluno.html?token=' + encodeURIComponent(token);
   var corpo = '<div style="font-family:Segoe UI,Arial,sans-serif;color:#212121;max-width:560px;margin:0 auto">' +
     '<h2 style="color:#4A2E1B">Oi, ' + esc(nome) + '!</h2>' +
     '<p>Seu pagamento foi confirmado. Sua Área do Estudante já está disponível:</p>' +
     '<p><a href="' + esc(link) + '" style="display:inline-block;background:#212121;color:#fff;padding:14px 26px;border-radius:999px;text-decoration:none;font-weight:700">Abrir minha Área do Estudante</a></p>' +
     '<p>Por lá você encontrará os materiais da oficina, o link do grupo e, depois do curso, o certificado.</p>' +
-    '<p style="color:#8A7A5C;font-size:.85rem">Pão de Verdade — Forneria Artesanal</p></div>';
-  GmailApp.sendEmail(email, 'Sua Área do Estudante — Pão de Verdade', 'Acesse sua Área do Estudante: ' + link, { htmlBody: corpo });
+    '<p style="color:#8A7A5C;font-size:.85rem">Alice Gussoni — Ateliê de Cerâmica</p></div>';
+  GmailApp.sendEmail(email, 'Sua Área do Estudante — Alice Gussoni', 'Acesse sua Área do Estudante: ' + link, { htmlBody: corpo });
   sheet.getRange(row, 17).setValue('sim');
 }
 
@@ -1951,7 +1952,7 @@ function reenviarAcessoPorContato(contato) {
   return {
     ok: false,
     naoEncontrado: true,
-    erro: 'Não encontramos inscrição com esse e-mail ou WhatsApp. Se você ainda não garantiu sua vaga, pode se inscrever pelo site ou chamar a gente no WhatsApp (34) 93618-6847. Se já pagou, fica tranquilo: a gente recebeu o aviso e vai te procurar.'
+    erro: 'Não encontramos inscrição com esse e-mail ou WhatsApp. Se você ainda não garantiu sua vaga, pode se inscrever pelo site ou chamar a gente no WhatsApp (34) 9XXXX-XXXX. Se já pagou, fica tranquilo: a gente recebeu o aviso e vai te procurar.'
   };
 }
 
@@ -1966,7 +1967,7 @@ function enviarAvisoCadastroNaoEncontrado(contato) {
     '<li>e-mail ou WhatsApp digitado diferente do cadastro;</li>' +
     '<li>ou uma pessoa que ainda não se inscreveu.</li></ul>' +
     '<p>Vale conferir na planilha de Inscritos e, se for o caso, responder essa pessoa pelo WhatsApp.</p>' +
-    '<p style="color:#8A7A5C;font-size:.85rem">Pão de Verdade — Forneria Artesanal</p></div>';
+    '<p style="color:#8A7A5C;font-size:.85rem">Alice Gussoni — Ateliê de Cerâmica</p></div>';
   GmailApp.sendEmail(destino, 'Tentativa de acesso à Área do Estudante — verificar',
     'Tentativa de acesso com: ' + contato + ' (' + agora + '). Não encontramos inscrição. Confira a planilha de Inscritos.',
     { htmlBody: corpo });
@@ -2187,9 +2188,9 @@ function enviarEmailConvite(email, nome, curso, dataTurma, link) {
     '<p><a href="' + esc(link) + '" style="display:inline-block;background:#212121;color:#fff;' +
     'padding:14px 26px;border-radius:999px;text-decoration:none;font-weight:700">' +
     'Entrar no grupo da turma</a></p>' +
-    '<p>Qualquer dúvida, é só chamar no WhatsApp: <strong>(34) 93618-6847</strong>.</p>' +
+    '<p>Qualquer dúvida, é só chamar no WhatsApp: <strong>(34) 9XXXX-XXXX</strong>.</p>' +
     '<p>Esperamos você com o forno ligado! 🍞</p>' +
-    '<p style="color:#8A7A5C;font-size:.85rem">Pão de Verdade — Forneria Artesanal</p>' +
+    '<p style="color:#8A7A5C;font-size:.85rem">Alice Gussoni — Ateliê de Cerâmica</p>' +
     '</div>';
   GmailApp.sendEmail(email, assunto, 'Sua vaga na oficina de ' + curso +
     (dataAmigavel ? ' do dia ' + dataAmigavel : '') +
@@ -2380,7 +2381,7 @@ function entrarNaLista(d) {
     var n = normalizarCurso(c);
     if (n && cursos.indexOf(n) === -1) cursos.push(n);
   });
-  if (!cursos.length) return { ok: false, erro: 'Escolha um curso (Pão, Pizza ou ambos).' };
+  if (!cursos.length) return { ok: false, erro: 'Escolha um curso (Descoberta, Imersão ou ambos).' };
   var sheet = getSheet('ListaEspera');
   var rows = sheet.getDataRange().getValues();
   var inseridos = [];
@@ -2575,9 +2576,9 @@ function insights() {
 }
 
 function obterPastaBackup() {
-  var it = DriveApp.getFoldersByName('Pão de Verdade Backups');
+  var it = DriveApp.getFoldersByName('Alice Gussoni Backups');
   if (it.hasNext()) return it.next();
-  return DriveApp.createFolder('Pão de Verdade Backups');
+  return DriveApp.createFolder('Alice Gussoni Backups');
 }
 
 function fazerBackup() {
@@ -2656,7 +2657,7 @@ function telegramTeste() {
     var res = UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
       method: 'post',
       contentType: 'application/json',
-      payload: JSON.stringify({ chat_id: chat, text: '🔔 Teste de venda — Pão de Verdade. Se você vê isto, a notificação está no ar!' }),
+      payload: JSON.stringify({ chat_id: chat, text: '🔔 Teste de venda — Alice Gussoni. Se você vê isto, a notificação está no ar!' }),
       muteHttpExceptions: true
     });
     var data = JSON.parse(res.getContentText());
@@ -2814,8 +2815,8 @@ function normalizarData(v) {
 function normalizarCurso(v) {
   if (!v) return '';
   var s = String(v).trim().toLowerCase().replace(/i+/g, 'i');
-  if (s.indexOf('pizza') !== -1 || s.indexOf('piza') !== -1) return 'Pizza';
-  if (s.indexOf('pão') !== -1 || s.indexOf('pao') !== -1) return 'Pão';
+  if (s.indexOf('imersã') !== -1 || s.indexOf('imersa') !== -1) return 'Imersão';
+  if (s.indexOf('descoberta') !== -1) return 'Descoberta';
   return String(v).trim();
 }
 
@@ -2887,15 +2888,15 @@ function manutencao() {
 function enviarAcessoAlunoComDados(nome, email, curso, dataTurma, token) {
   if (!email) return;
   var dataAmigavel = formatarDataAmigavel(dataTurma);
-  var link = 'https://ferrarijonas.github.io/paodeverdade/aluno.html?token=' + encodeURIComponent(token);
+  var link = 'https://ferrarijonas.github.io/alicegussoni/aluno.html?token=' + encodeURIComponent(token);
   var corpo = '<div style="font-family:Segoe UI,Arial,sans-serif;color:#212121;max-width:560px;margin:0 auto">' +
     '<h2 style="color:#4A2E1B">Oi, ' + esc(nome) + '!</h2>' +
     '<p>Sua vaga na oficina de <strong>' + esc(curso) + '</strong>' +
     (dataAmigavel ? ' do dia <strong>' + esc(dataAmigavel) + '</strong>' : '') +
     ' está confirmada.</p>' +
     '<p><a href="' + esc(link) + '" style="display:inline-block;background:#212121;color:#fff;padding:14px 26px;border-radius:999px;text-decoration:none;font-weight:700">Abrir minha Área do Estudante</a></p>' +
-    '<p style="color:#8A7A5C;font-size:.85rem">Pão de Verdade — Forneria Artesanal</p></div>';
-  GmailApp.sendEmail(email, 'Sua Área do Estudante — Pão de Verdade',
+    '<p style="color:#8A7A5C;font-size:.85rem">Alice Gussoni — Ateliê de Cerâmica</p></div>';
+  GmailApp.sendEmail(email, 'Sua Área do Estudante — Alice Gussoni',
     'Sua vaga na oficina de ' + curso + (dataAmigavel ? ' do dia ' + dataAmigavel : '') +
     ' está confirmada. Acesse sua Área do Estudante: ' + link, { htmlBody: corpo });
 }

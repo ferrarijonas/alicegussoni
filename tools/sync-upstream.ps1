@@ -8,8 +8,7 @@ $upstream = Join-Path $env:TEMP 'upstream-paodeverdade'
 
 $shared = @(
   'assets/js/main.js', 'assets/js/main.min.js',
-  'assets/js/analytics.js', 'assets/js/analytics.min.js',
-  'assets/js/lotada.js', 'assets/js/lotada.min.js'
+  'assets/js/analytics.js', 'assets/js/analytics.min.js'
 )
 
 if (Test-Path $upstream) { Remove-Item -Recurse -Force $upstream }

@@ -1,8 +1,10 @@
-/* checkout.js — Pão de Verdade — página dedicada */
+/* checkout.js — Alice Gussoni — página dedicada */
 (function () {
   var CONFIG = (typeof PDV_CONFIG !== 'undefined') ? PDV_CONFIG : {};
-  var PRECO = 275;
-  var CURSO_INFO = { 'Pão': { hora: '8h às 13h' }, 'Pizza': { hora: '17h às 22h' } };
+  var CURSO_INFO = {
+    'Descoberta': { hora: 'Tarde · 3h30', preco: 350 },
+    'Imersão': { hora: '8h às 17h30', preco: 600 }
+  };
   var codigoOk = false;
   var codigoTimer = null;
   var codigoTipo = '';
@@ -82,8 +84,8 @@
   }
 
   function pessoaBlock(i, cursoPre) {
-    var isPao = cursoPre === 'Pão';
-    var isPizza = cursoPre === 'Pizza';
+    var isDescoberta = cursoPre === 'Descoberta';
+    var isImersao = cursoPre === 'Imersão';
     return '' +
       '<div class="ck-pessoa" data-pessoa="' + i + '">' +
       '<div class="ck-pessoa-title">Pessoa ' + (i + 1) + '</div>' +
@@ -97,8 +99,8 @@
       '</div>' +
       '<div class="ck-field"><span class="ck-label">Curso(s) <span class="ck-req">*</span></span>' +
       '<div class="ck-cursos">' +
-      '<label class="ck-curso"><input type="checkbox" name="ckCurso' + i + '" value="Pão" data-pessoa="' + i + '"' + (isPao ? ' checked' : '') + '><span class="ck-curso-txt"><b>Pão</b><small>8h às 13h · R$ 275</small></span></label>' +
-      '<label class="ck-curso"><input type="checkbox" name="ckCurso' + i + '" value="Pizza" data-pessoa="' + i + '"' + (isPizza ? ' checked' : '') + '><span class="ck-curso-txt"><b>Pizza</b><small>17h às 22h · R$ 275</small></span></label>' +
+      '<label class="ck-curso"><input type="checkbox" name="ckCurso' + i + '" value="Descoberta" data-pessoa="' + i + '"' + (isDescoberta ? ' checked' : '') + '><span class="ck-curso-txt"><b>Descoberta</b><small>' + CURSO_INFO['Descoberta'].hora + ' · R$ ' + CURSO_INFO['Descoberta'].preco + '</small></span></label>' +
+      '<label class="ck-curso"><input type="checkbox" name="ckCurso' + i + '" value="Imersão" data-pessoa="' + i + '"' + (isImersao ? ' checked' : '') + '><span class="ck-curso-txt"><b>Imersão</b><small>' + CURSO_INFO['Imersão'].hora + ' · R$ ' + CURSO_INFO['Imersão'].preco + '</small></span></label>' +
       '</div></div>' +
       '</div>';
   }
@@ -123,7 +125,8 @@
     var pessoas = lerPessoas();
     var itens = 0;
     pessoas.forEach(function (p) { itens += (p.cursos || []).length; });
-    var bruto = itens * PRECO;
+    var bruto = 0;
+    pessoas.forEach(function (p) { (p.cursos || []).forEach(function (c) { bruto += CURSO_INFO[c] ? CURSO_INFO[c].preco : 0; }); });
     var desconto = 0;
     if (codigoOk) {
       if (codigoTipo === 'reserva') desconto = Math.round(bruto * codigoValor / 100 * 100) / 100;
@@ -150,7 +153,8 @@
         t.pessoas.forEach(function (p, idx) {
           (p.cursos || []).forEach(function (c) {
             var hora = CURSO_INFO[c] ? CURSO_INFO[c].hora : '';
-            linhas += '<div class="ck-resumo-linha"><span>P' + (idx + 1) + ' · ' + c + (hora ? ' ' + hora : '') + '</span><span>R$ ' + PRECO.toFixed(2) + '</span></div>';
+            var preco = CURSO_INFO[c] ? CURSO_INFO[c].preco : 0;
+            linhas += '<div class="ck-resumo-linha"><span>P' + (idx + 1) + ' · ' + c + (hora ? ' ' + hora : '') + '</span><span>R$ ' + preco.toFixed(2) + '</span></div>';
           });
         });
         var descLabel = codigoOk ? (codigoTipo === 'reserva' && codigoValor > 0 ? 'Desconto reservado (' + codigoValor + '%)' : 'Desconto (código)') : 'Desconto dupla/2 cursos (15%)';
@@ -298,7 +302,7 @@
         var a = document.createElement('a');
         a.id = 'ckEsperaLink';
         a.href = 'agenda.html';
-        a.style.cssText = 'display:block;margin-top:6px;font-weight:700;text-decoration:underline;color:#4A2E1B;cursor:pointer';
+        a.style.cssText = 'display:block;margin-top:6px;font-weight:700;text-decoration:underline;color:#5B4432;cursor:pointer';
         a.textContent = 'Entrar na lista de espera →';
         el.appendChild(a);
       }
@@ -703,16 +707,16 @@
 
   function init() {
     preCurso = getParam('curso') || '';
-    dataTurma = getParam('data') || getParam('dataTurma') || '29/08/2026';
+    dataTurma = getParam('data') || getParam('dataTurma') || '19/09/2026';
     // normaliza curso (acentos, case)
     (function () {
       var n = String(preCurso).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      if (n === 'pao') preCurso = 'Pão';
-      else if (n === 'pizza') preCurso = 'Pizza';
+      if (n === 'descoberta') preCurso = 'Descoberta';
+      else if (n === 'imersao' || n === 'imersa') preCurso = 'Imersão';
       else if (preCurso) {
         // fallback capitaliza
         preCurso = preCurso.charAt(0).toUpperCase() + preCurso.slice(1).toLowerCase();
-        if (preCurso === 'Pao') preCurso = 'Pão';
+        if (preCurso === 'Imersao') preCurso = 'Imersão';
       }
     })();
     // header turma
@@ -721,7 +725,7 @@
     var elCurso = qs('#ckTurmaCurso');
     if (elCurso) {
       if (preCurso) elCurso.textContent = preCurso + (CURSO_INFO[preCurso] ? ' · ' + CURSO_INFO[preCurso].hora : '');
-      else elCurso.textContent = 'Pão e Pizza';
+      else elCurso.textContent = 'Descoberta e Imersão';
     }
     // qtd inicial
     setQtd(1);

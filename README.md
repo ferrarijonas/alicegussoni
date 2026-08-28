@@ -27,10 +27,10 @@ tools/sync-upstream.ps1 + .github/workflows/sync-upstream.yml → sincronizaçã
 
 ## Estado atual
 
-- **Backend:** pendente. Criar planilha + Apps Script + Mercado Pago da Alice e preencher
-  `assets/js/inscricao-config.js` (ver `backend/COMO-CONFIGURAR.md`).
-- **Catálogo:** pendente. Cursos/preços/datas da Alice ainda não definidos — páginas ainda têm o conteúdo-modelo da padaria.
-- **Marca:** paleta/fonte já extraídas no projeto Denaro (`C:\Alice\Denaro\DenaroDesignSpec.md`).
+- **Cursos definidos** (dos PDFs da Alice): **Descoberta** (3h30 · R$350 · 19/09) e **Imersão** (7h · R$600 · 17/10). Páginas, checkout e backend já traduzidos para os cursos da Alice.
+- **Backend:** pendente. Criar planilha + Apps Script + Mercado Pago da Alice e preencher `assets/js/inscricao-config.js` (ver `backend/COMO-CONFIGURAR.md`).
+- **Pendente:** número do WhatsApp da Alice (buscar `TODO` nos `.html`), fotos/feed do IG (aguardando download oficial), textos finais na voz dela.
+- **Marca:** aplicada — paleta marrom-quente/bege/creme, Plus Jakarta Sans, logo oficial (extraída de `alicegussoni.com.br`, ver `C:\Alice\Denaro\DenaroDesignSpec.md`).
 
 ## Deploy
 

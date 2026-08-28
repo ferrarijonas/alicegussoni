@@ -1,7 +1,7 @@
-/* Lista de espera unificada (PdvEspera) — um programa só, por curso (Pão/Pizza/Ambos), sem data.
+/* Lista de espera unificada (PdvEspera) — um programa só, por curso (Descoberta/Imersão/Ambos), sem data.
    Uso:
-     PdvEspera.montar({ container: '#x', cursos: ['Pão','Pizza'], selecionado: 'Pão', botao: 'Avisar quando abrir' });
-     PdvEspera.link({ container: '#x', cursos: ['Pão','Pizza'], selecionado: 'Pão' }); */
+     PdvEspera.montar({ container: '#x', cursos: ['Descoberta','Imersão'], selecionado: 'Descoberta', botao: 'Avisar quando abrir' });
+     PdvEspera.link({ container: '#x', cursos: ['Descoberta','Imersão'], selecionado: 'Descoberta' }); */
 (function () {
   'use strict';
   var API = (typeof PDV_CONFIG !== 'undefined' && PDV_CONFIG.WEB_APP_URL) || '';
@@ -9,20 +9,20 @@
   if (!document.getElementById('pdvEsperaCss')) {
     var st = document.createElement('style');
     st.id = 'pdvEsperaCss';
-    st.textContent = '.e-form{margin-top:8px;padding:12px;border:1px solid #E2DED7;border-radius:10px;background:#FCFBF9;font-size:.85rem}' +
-      '.e-titulo{display:block;color:#4A2E1B;font-weight:700}' +
-      '.e-texto{color:#6E6A64;margin:6px 0}' +
-      '.e-form .e-label{display:block;font-size:.8rem;font-weight:700;color:#4A2E1B;margin-top:6px}' +
-      '.e-form select.e-curso,.e-form input{width:100%;margin-top:4px;padding:8px 10px;border:1px solid #E2DED7;border-radius:8px;font-size:.85rem;box-sizing:border-box;background:#fff}' +
+    st.textContent = '.e-form{margin-top:8px;padding:12px;border:1px solid #E8E0D4;border-radius:10px;background:#F7F4EF;font-size:.85rem}' +
+      '.e-titulo{display:block;color:#5B4432;font-weight:700}' +
+      '.e-texto{color:#9C8B7C;margin:6px 0}' +
+      '.e-form .e-label{display:block;font-size:.8rem;font-weight:700;color:#5B4432;margin-top:6px}' +
+      '.e-form select.e-curso,.e-form input{width:100%;margin-top:4px;padding:8px 10px;border:1px solid #E8E0D4;border-radius:8px;font-size:.85rem;box-sizing:border-box;background:#fff}' +
       '.e-campos{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}' +
       '.e-campos input{flex:1 1 130px;min-width:0}' +
-      '.e-btn{padding:8px 16px;border:none;border-radius:999px;background:#212121;color:#fff;font-weight:700;cursor:pointer}' +
+      '.e-btn{padding:8px 16px;border:none;border-radius:999px;background:#5B4432;color:#fff;font-weight:700;cursor:pointer}' +
       '.e-btn:disabled{opacity:.6;cursor:default}' +
       '.e-msg{margin-top:6px;font-size:.82rem}' +
       '.pdvEsperaForm .e-form{border:none;background:transparent;padding:0;margin:0}' +
       '.pdvEsperaForm .e-campos{display:grid;grid-template-columns:1fr;gap:10px}' +
       '.pdvEsperaForm .e-btn{width:100%;padding:13px;font-size:1rem;margin-top:4px}' +
-      '.pdvEsperaForm .e-label{font-size:.85rem;font-weight:700;color:#212121;margin-top:14px}' +
+      '.pdvEsperaForm .e-label{font-size:.85rem;font-weight:700;color:#5B4432;margin-top:14px}' +
       '.pdvEsperaForm input,.pdvEsperaForm select.e-curso{padding:12px 14px;font-size:1rem}';
     document.head.appendChild(st);
   }
@@ -81,15 +81,15 @@
     var whats = qs('.e-whats', box).value.trim().replace(/\D/g, '');
     var email = qs('.e-email', box).value.trim();
     var msg = qs('.e-msg', box);
-    if (!nome) { msg.textContent = 'Informe seu nome.'; msg.style.color = '#C62828'; return; }
-    if (whats.length < 10 && !email) { msg.textContent = 'Informe WhatsApp ou e-mail.'; msg.style.color = '#C62828'; return; }
+    if (!nome) { msg.textContent = 'Informe seu nome.'; msg.style.color = '#A34A2F'; return; }
+    if (whats.length < 10 && !email) { msg.textContent = 'Informe WhatsApp ou e-mail.'; msg.style.color = '#A34A2F'; return; }
     msg.textContent = 'Enviando…'; msg.style.color = '';
     jsonp('acao=listaespera&cursos=' + encodeURIComponent(cursos.join(',')) +
       '&nome=' + encodeURIComponent(nome) +
       '&whatsapp=' + encodeURIComponent(whats) +
       '&email=' + encodeURIComponent(email), function (res) {
       msg.textContent = res && res.ok ? 'Você entrou na lista! Avisamos quando abrir vaga. 💛' : ((res && res.erro) || 'Não foi possível agora. Tente de novo.');
-      msg.style.color = res && res.ok ? '#2E7D32' : '#C62828';
+      msg.style.color = res && res.ok ? '#5C6B52' : '#A34A2F';
       if (res && res.ok) { var b = qs('.e-btn', box); if (b) b.disabled = true; }
     });
   }
@@ -97,7 +97,7 @@
   function montar(opts) {
     var box = typeof opts.container === 'string' ? document.querySelector(opts.container) : opts.container;
     if (!box) return;
-    box._cursos = (opts.cursos && opts.cursos.length) ? opts.cursos : ['Pão', 'Pizza'];
+    box._cursos = (opts.cursos && opts.cursos.length) ? opts.cursos : ['Descoberta', 'Imersão'];
     box._selecionado = opts.selecionado || '';
     box._titulo = opts.titulo || '';
     box._texto = opts.texto || '';
@@ -141,7 +141,7 @@
     var box = document.createElement('div');
     form.innerHTML = '';
     form.appendChild(box);
-    box._cursos = (opts.cursos && opts.cursos.length) ? opts.cursos : ['Pão', 'Pizza'];
+    box._cursos = (opts.cursos && opts.cursos.length) ? opts.cursos : ['Descoberta', 'Imersão'];
     box._selecionado = opts.selecionado || '';
     box._titulo = '';
     box._texto = '';

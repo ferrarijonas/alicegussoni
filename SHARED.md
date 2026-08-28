@@ -11,7 +11,9 @@ Os arquivos abaixo **nunca são editados aqui** — eles são copiados do upstre
 |---|---|
 | `assets/js/main.js` / `.min.js` | menu mobile, rodapé, feed do Instagram |
 | `assets/js/analytics.js` / `.min.js` | rastreador leve (sem cookies) |
-| `assets/js/lotada.js` / `.min.js` | trava de compra quando a turma lota |
+
+> `lotada.js` foi **removido** do sync: é a trava de compra, mas tinha os cursos
+> (`['Pão','Pizza']`) embutidos. Está forkado localmente com os cursos da Alice.
 
 ## Como sincronizar
 

@@ -2,12 +2,11 @@
   'use strict';
 
   var CONFIG = (typeof PDV_CONFIG !== 'undefined') ? PDV_CONFIG : {};
-  var PRECO = 275;
   var codigoOk = false;
   var codigoTimer = null;
   var CURSO_INFO = {
-    'Pão': { hora: '8h às 13h', icon: '🍞' },
-    'Pizza': { hora: '17h às 22h', icon: '🍕' }
+    'Descoberta': { hora: 'Tarde · 3h30', icon: '🎨' },
+    'Imersão': { hora: '8h às 17h30', icon: '🎨' }
   };
 
   function abrirModal(preCurso, dataTurma) {
@@ -51,8 +50,8 @@
   }
 
   function pessoaBlock(i, preCurso) {
-    var checkedPao = preCurso === 'Pão' ? ' checked' : '';
-    var checkedPizza = preCurso === 'Pizza' ? ' checked' : '';
+    var checkedDescoberta = preCurso === 'Descoberta' ? ' checked' : '';
+    var checkedImersao = preCurso === 'Imersão' ? ' checked' : '';
     var label = i === 0 ? 'PESSOA 1' : 'PESSOA 2';
     return '<div class="pdv-pessoa">' +
       '<h4 class="pdv-pessoa-title">' + label + '</h4>' +
@@ -63,8 +62,8 @@
       '<label for="pdvEmail' + i + '">E-mail</label>' +
       '<input type="email" id="pdvEmail' + i + '" autocomplete="email" required>' +
       '<p class="pdv-pag-label">Curso(s)</p>' +
-      '<label class="pdv-radio"><input type="checkbox" name="pdvCurso' + i + '" value="Pão" data-pessoa="' + i + '"' + checkedPao + '> Pão ' + CURSO_INFO['Pão'].hora + ' · R$ 275</label>' +
-      '<label class="pdv-radio"><input type="checkbox" name="pdvCurso' + i + '" value="Pizza" data-pessoa="' + i + '"' + checkedPizza + '> Pizza ' + CURSO_INFO['Pizza'].hora + ' · R$ 275</label>' +
+      '<label class="pdv-radio"><input type="checkbox" name="pdvCurso' + i + '" value="Descoberta" data-pessoa="' + i + '"' + checkedDescoberta + '> Descoberta ' + CURSO_INFO['Descoberta'].hora + ' · R$ ' + CURSO_INFO['Descoberta'].preco + '</label>' +
+      '<label class="pdv-radio"><input type="checkbox" name="pdvCurso' + i + '" value="Imersão" data-pessoa="' + i + '"' + checkedImersao + '> Imersão ' + CURSO_INFO['Imersão'].hora + ' · R$ ' + CURSO_INFO['Imersão'].preco + '</label>' +
       '</div>';
   }
 
@@ -89,7 +88,8 @@
     var pessoas = lerPessoas();
     var itens = 0;
     pessoas.forEach(function (p) { itens += (p.cursos || []).length; });
-    var bruto = itens * PRECO;
+    var bruto = 0;
+    pessoas.forEach(function (p) { (p.cursos || []).forEach(function (c) { bruto += CURSO_INFO[c] ? CURSO_INFO[c].preco : 0; }); });
     var desconto = 0;
     if (codigoOk) {
       desconto = Math.round(bruto * 0.15 * 100) / 100;
@@ -111,7 +111,8 @@
     var html = '';
     pessoas.forEach(function (p, i) {
       (p.cursos || []).forEach(function (c) {
-        html += '<div class="pdv-resumo-linha"><span>P' + (i + 1) + ' · ' + c + '</span><span>R$ ' + PRECO.toFixed(2) + '</span></div>';
+        var preco = CURSO_INFO[c] ? CURSO_INFO[c].preco : 0;
+        html += '<div class="pdv-resumo-linha"><span>P' + (i + 1) + ' · ' + c + '</span><span>R$ ' + preco.toFixed(2) + '</span></div>';
       });
     });
     html += '<div class="pdv-resumo-linha"><span>Subtotal</span><span>R$ ' + t.bruto.toFixed(2) + '</span></div>';
@@ -127,7 +128,7 @@
   function chamar(params, cb, err) {
     var url = CONFIG.WEB_APP_URL || '';
     if (!url || url.indexOf('COLE_AQUI') !== -1) {
-      err('Inscrição online ainda não configurada. Chama a gente no WhatsApp (34) 93618-6847!');
+      err('Inscrição online ainda não configurada. Chama a gente no WhatsApp!');
       return;
     }
     var id = 'pdvPedido' + Date.now();
@@ -332,7 +333,7 @@
       if (!configurado) return;
       link.addEventListener('click', function (e) {
         e.preventDefault();
-        var curso = link.classList.contains('pao') ? 'Pão' : 'Pizza';
+        var curso = link.classList.contains('descoberta') ? 'Descoberta' : 'Imersão';
         abrirModal(curso, link.getAttribute('data-turma') || '');
       });
     });

@@ -21,7 +21,6 @@ jobs:
           files=(
             "assets/js/main.js" "assets/js/main.min.js"
             "assets/js/analytics.js" "assets/js/analytics.min.js"
-            "assets/js/lotada.js" "assets/js/lotada.min.js"
           )
           for f in "${files[@]}"; do
             mkdir -p "$(dirname "$f")"

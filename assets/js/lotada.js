@@ -1,4 +1,4 @@
-/* lotada.js — Pão de Verdade — trava de compra em todo o site.
+/* lotada.js — Alice Gussoni — trava de compra em todo o site.
    Quando a turma está cheia ou ainda não foi aberta, troca o botão de comprar
    por "TURMA LOTADA"/"EM BREVE" + lista de espera e esconde o pagamento direto.
    O estado bloqueado fica cacheado na sessão (5 min) para o próximo acesso
@@ -58,7 +58,7 @@
   function abrirEspera(curso) {
     if (typeof PdvEspera === 'undefined') return;
     PdvEspera.abrir({
-      cursos: ['Pão', 'Pizza'],
+      cursos: ['Descoberta', 'Imersão'],
       selecionado: curso || '',
       botao: 'Entrar na lista de espera',
       texto: 'Avisamos por WhatsApp/e-mail quando abrir vaga. Sem compromisso.'
@@ -159,7 +159,7 @@
     links.forEach(function (L) {
       var st = c[chave(L.info.curso, L.info.data)];
       if (!st) return;
-      virar(L.el, L.info, st.cheia ? 'TURMA LOTADA' : 'EM BREVE', st.cheia ? '#C62828' : '#6E6A64');
+      virar(L.el, L.info, st.cheia ? 'TURMA LOTADA' : 'EM BREVE', st.cheia ? '#A34A2F' : '#9C8B7C');
       if (st.cheia) alguma = true;
     });
     pintarVagasCache();
@@ -217,13 +217,13 @@
         else if (t !== null) window.location.href = L.el.href;
       }
       if (t === undefined) {
-        virar(L.el, L.info, 'EM BREVE', '#6E6A64');
+        virar(L.el, L.info, 'EM BREVE', '#9C8B7C');
         cacheGravar(L.info.curso, L.info.data, false);
         algumaBloqueada = true;
         return;
       }
       if (t !== null && Number(t.restantes) <= 0) {
-        virar(L.el, L.info, 'TURMA LOTADA', '#C62828');
+        virar(L.el, L.info, 'TURMA LOTADA', '#A34A2F');
         cacheGravar(L.info.curso, L.info.data, true);
         algumaBloqueada = true;
         return;

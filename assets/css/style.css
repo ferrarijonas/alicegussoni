@@ -1,27 +1,26 @@
 /* =========================================================
-   Pão de Verdade — identidade visual (Forneria Artesanal)
-   Tons de cinza + preto #212121 (como o cardápio online)
-   Acento: marrom fechado #4A2E1B
-   Títulos: Playfair Display | Corpo: Open Sans
+   Alice Gussoni — identidade visual (Ateliê de Cerâmica)
+   Paleta extraída de alicegussoni.com.br (marrom-quente/bege/creme)
+   Títulos: Plus Jakarta Sans | Corpo: Plus Jakarta Sans
    ========================================================= */
 
 :root {
-  --bg: #FCFBF9;
-  --bg-alt: #F2F0EC;
-  --cta: #212121;
-  --cta-dark: #000000;
-  --text: #212121;
-  --text-soft: #6E6A64;
-  --line: #E2DED7;
-  --accent: #4A2E1B;
-  --accent-dark: #382213;
-  --accent-soft: #EFEAE3;
-  --gold: #8A7A5C;
-  --olive: #6E6A64;
+  --bg: #F7F4EF;
+  --bg-alt: #EFE9DF;
+  --cta: #5B4432;
+  --cta-dark: #4A3727;
+  --text: #664B38;
+  --text-soft: #9C8B7C;
+  --line: #E8E0D4;
+  --accent: #5B4432;
+  --accent-dark: #4A3727;
+  --accent-soft: #F0EAE0;
+  --gold: #AB9881;
+  --olive: #9C8B7C;
   --white: #FFFFFF;
-  --serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  --sans: 'Open Sans', 'Segoe UI', Arial, sans-serif;
-  --shadow: 0 12px 34px rgba(33, 33, 33, 0.1);
+  --serif: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+  --sans: 'Plus Jakarta Sans', 'Segoe UI', Arial, sans-serif;
+  --shadow: 0 12px 34px rgba(46, 42, 37, 0.08);
   --radius: 10px;
 }
 
@@ -29,11 +28,11 @@
 
 html { scroll-behavior: smooth; }
 
-body {
+  body {
   font-family: var(--sans);
   background:
-    radial-gradient(ellipse 70% 50% at 15% -8%, rgba(74, 46, 27, 0.04), transparent 60%),
-    radial-gradient(ellipse 55% 45% at 95% 0%, rgba(33, 33, 33, 0.03), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 15% -8%, rgba(91, 68, 50, 0.04), transparent 60%),
+    radial-gradient(ellipse 55% 45% at 95% 0%, rgba(102, 75, 56, 0.03), transparent 55%),
     var(--bg);
   color: var(--text);
   line-height: 1.7;
@@ -232,7 +231,7 @@ a:hover { color: var(--cta-dark); }
 }
 .section-gente .section-title { color: #FFFFFF; }
 .section-gente .section-sub { color: #D9CCB8; }
-.section-gente .kicker { color: #E9B873; }
+.section-gente .kicker { color: #AB9881; }
 .section-gente .ig-card { background: #F6F1E8; }
 .section-gente .btn-primary {
   background: var(--accent);
@@ -497,9 +496,9 @@ a:hover { color: var(--cta-dark); }
 
 .curso-vagas .ck-vagas-warn { font-size: .82rem; font-weight: 700; color: #B26A00; margin-top: 8px; line-height: 1.35; }
 
-.curso-vagas .ck-vagas-cheia { font-size: .82rem; font-weight: 700; color: #C62828; margin-top: 8px; line-height: 1.35; }
+.curso-vagas .ck-vagas-cheia { font-size: .82rem; font-weight: 700; color: #A34A2F; margin-top: 8px; line-height: 1.35; }
 
-.curso-vagas .ck-vagas-cheia a { color: #C62828; }
+.curso-vagas .ck-vagas-cheia a { color: #A34A2F; }
 
 /* ---------- Detail blocks ---------- */
 .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
@@ -837,8 +836,8 @@ a:hover { color: var(--cta-dark); }
 
 .agenda-course:hover { transform: translateY(-1px); box-shadow: var(--shadow); color: var(--text); }
 
-.agenda-course.pao { border-left-color: #4A2E1B; }
-.agenda-course.pizza { border-left-color: #8A7A5C; }
+.agenda-course.descoberta { border-left-color: #5B4432; }
+.agenda-course.imersao { border-left-color: #AB9881; }
 
 .agenda-course .tag {
   font-size: .72rem;
@@ -934,8 +933,8 @@ a:hover { color: var(--cta-dark); }
 .pdv-erro {
   margin-top: 14px;
   padding: 10px 12px;
-  background: #FFEBEE;
-  color: #C62828;
+  background: #F7E9E4;
+  color: #A34A2F;
   border-radius: 8px;
   font-size: .88rem;
 }
@@ -945,8 +944,8 @@ a:hover { color: var(--cta-dark); }
   font-size: .85rem;
   font-weight: 700;
 }
-.pdv-codigo-hint.ok { color: #2E7D32; }
-.pdv-codigo-hint.err { color: #C62828; }
+.pdv-codigo-hint.ok { color: #5C6B52; }
+.pdv-codigo-hint.err { color: #A34A2F; }
 
 .pdv-nota {
   margin-top: 16px;
@@ -976,7 +975,7 @@ a:hover { color: var(--cta-dark); }
 }
 .pdv-off {
   display: inline-block;
-  background: var(--green, #2E7D32);
+  background: var(--green, #5C6B52);
   color: #fff;
   font-size: .7rem;
   font-weight: 700;
