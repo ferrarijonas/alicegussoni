@@ -1,0 +1,19 @@
+--- ALICE 18 POSTS (2025-2026) — @alicegussoni.ceramica ---
+tamanho medio legenda: 399 chars
+total caps: 18
+top palavras: arte(11), oficina(11), ceramica(8), barroterapia(8), dia(8), material(8), petiscos(8), inscrições(8), ficar(7), valor(7), pix(7), cartão(7), crédito(7), fazer(7), duas(7)
+top hashtags: #ceramica(8), #escultura(4), #scultura(3), #argila(3), #pottery(2), #ceramicaartesanal(2), #sculpture(2), #barroterapia(2)
+
+--- AMOSTRA VOZ (6 legendas) ---
+1. A diferença da mesma cor de pigmento em alta e em baixa temperatura. Mesmo fornecedor, mesmo método. Um deles queimado a 1050° e o outro em 1250° Quem você acha que foi em alta? #ceramica #pinturaemcerâmica #pottery #ceramicaartesanal #potterylover...
+
+2. A cerâmica carrega simbologias que pra mim são como amuletos. Quando olhamos para aquele objeto, recebemos todo o sentimento colocado ali. Todo o amor, colo, proteção, cuidado… família. Essas peças vão pra um altar de memórias. Homenagem para o pai de uma grande amiga minha....
+
+3. Amanhã de manhã tem Barroterapia e acordei com vontade de dar esse presente. Para concorrer à vaga, comente nesse post marcando algum outro apaixonado por cerâmica! Hoje às 20h, pelo “sorteio.com” um dos comentários vai ser selecionado para a vaga! Vou compartilhar no stories. Bo...
+
+4. Barroterapia chegando na área! Dia 25 de abril! Uma manhã para descobrir pinceladas, cores, fazermos arte e amizades. Seguem as informações: A oficina é das 8:30 às 11:30, a peça que vc vai pintar vai ficar para ser queimada e assim que tiver pronta te aviso para vir buscar. Mate...
+
+5. Que nesta Páscoa a gente se lembre: assim como o barro em nossas mãos, a vida também está em constante transformação. Entre apertos, pausas e recomeços, somos moldados com delicadeza e propósito. E é justamente nesse processo, às vezes imperfeito, às vezes inesperado, que algo no...
+
+6. Primeira Oficina Barroterapia do ano está chegando: dia 14 de março! Uma tarde divertida e descomplicada para fazermos arte. Seguem as informações: A oficina é das 15 às 18:30, a peça que vc vai produzir vai ficar para ser queimada e esmaltada, e assim que tiver pronta te aviso p...
+
