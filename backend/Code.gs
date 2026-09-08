@@ -993,7 +993,7 @@ function cancelarPedidoComCredito(d) {
       var dTurma = new Date(Number(dp[2]), Number(dp[1]) - 1, Number(dp[0]));
       var limite = new Date(new Date().getTime() + 5 * 24 * 60 * 60 * 1000);
       if (isNaN(dTurma.getTime()) || dTurma.getTime() < limite.getTime()) {
-        return { ok: false, erro: 'Faltam menos de 5 dias para a oficina. Chama a gente no WhatsApp (34) 9XXXX-XXXX que resolvemos rapidinho.', janela: false };
+        return { ok: false, erro: 'Faltam menos de 5 dias para a oficina. Chama a gente no WhatsApp (34) 93618-3288 que resolvemos rapidinho.', janela: false };
       }
     }
   }
@@ -1952,7 +1952,7 @@ function reenviarAcessoPorContato(contato) {
   return {
     ok: false,
     naoEncontrado: true,
-    erro: 'Não encontramos inscrição com esse e-mail ou WhatsApp. Se você ainda não garantiu sua vaga, pode se inscrever pelo site ou chamar a gente no WhatsApp (34) 9XXXX-XXXX. Se já pagou, fica tranquilo: a gente recebeu o aviso e vai te procurar.'
+    erro: 'Não encontramos inscrição com esse e-mail ou WhatsApp. Se você ainda não garantiu sua vaga, pode se inscrever pelo site ou chamar a gente no WhatsApp (34) 93618-3288. Se já pagou, fica tranquilo: a gente recebeu o aviso e vai te procurar.'
   };
 }
 
@@ -2188,7 +2188,7 @@ function enviarEmailConvite(email, nome, curso, dataTurma, link) {
     '<p><a href="' + esc(link) + '" style="display:inline-block;background:#212121;color:#fff;' +
     'padding:14px 26px;border-radius:999px;text-decoration:none;font-weight:700">' +
     'Entrar no grupo da turma</a></p>' +
-    '<p>Qualquer dúvida, é só chamar no WhatsApp: <strong>(34) 9XXXX-XXXX</strong>.</p>' +
+    '<p>Qualquer dúvida, é só chamar no WhatsApp: <strong>(34) 93618-3288</strong>.</p>' +
     '<p>Esperamos você com o forno ligado! 🍞</p>' +
     '<p style="color:#8A7A5C;font-size:.85rem">Alice Gussoni — Ateliê de Cerâmica</p>' +
     '</div>';
