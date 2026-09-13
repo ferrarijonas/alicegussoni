@@ -2,7 +2,7 @@
 (function () {
   var CONFIG = (typeof PDV_CONFIG !== 'undefined') ? PDV_CONFIG : {};
   var CURSO_INFO = {
-    'Descoberta': { hora: 'Tarde · 3h30', preco: 350 },
+    'Descoberta': { hora: '14h às 17h30', preco: 350 },
     'Imersão': { hora: '8h às 17h30', preco: 600 }
   };
   var codigoOk = false;

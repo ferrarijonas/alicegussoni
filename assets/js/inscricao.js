@@ -5,7 +5,7 @@
   var codigoOk = false;
   var codigoTimer = null;
   var CURSO_INFO = {
-    'Descoberta': { hora: 'Tarde · 3h30', icon: '🎨' },
+    'Descoberta': { hora: '14h às 17h30', icon: '🎨' },
     'Imersão': { hora: '8h às 17h30', icon: '🎨' }
   };
 
