@@ -1079,3 +1079,44 @@ a:hover { color: var(--cta-dark); }
   .gift-box { grid-template-columns: 1fr; }
   .gift-box img { height: 200px; }
 }
+/* ---------- Kit em destaque dentro de "O que esta incluso" ---------- */
+.incluso-kit {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 14px;
+  background: var(--accent-soft);
+  border: 1px solid var(--gold);
+  border-radius: var(--radius);
+}
+
+.incluso-kit img {
+  width: 76px;
+  height: 76px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex: none;
+}
+
+.incluso-kit .incluso-kit-txt { min-width: 0; }
+
+.incluso-kit strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: var(--cta);
+  line-height: 1.25;
+}
+
+.incluso-kit p {
+  color: var(--text-soft);
+  font-size: .88rem;
+  margin-top: 2px;
+}
+
+.incluso-kit .gift-tag { margin-bottom: 6px; }
+
+@media (min-width: 600px) {
+  .incluso-kit img { width: 92px; height: 92px; }
+}
