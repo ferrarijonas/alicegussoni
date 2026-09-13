@@ -81,7 +81,7 @@
     </section>
   </main>
 
-  <footer class="site-footer"><div class="footer-inner"><div class="footer-bottom">© <span id="year"></span> Alice Gussoni. Todos os direitos reservados.</div></div></footer>
+  <footer class="site-footer"><div class="footer-inner"><div class="footer-bottom">© <span id="year"></span> Alice Gussoni. Todos os direitos reservados. · <a href="https://www.alicegussoni.com.br" target="_blank" rel="noopener">Loja virtual</a></div></div></footer>
 
   <script>
     (function () {
@@ -161,7 +161,7 @@
         function blocoCurso(c) {
           var grupo = c.grupo ? '<a href="' + esc(c.grupo) + '" target="_blank" rel="noopener">Entrar no grupo da turma →</a>' : '<p>O link do grupo será liberado em breve.</p>';
           var apostila = c.apostila ? '<a href="' + esc(c.apostila) + '" target="_blank" rel="noopener">Abrir apostila →</a>' : '<p>Será liberada antes da oficina.</p>';
-          var certificado = c.certificado ? '<a href="' + esc(c.certificado) + '" target="_blank" rel="noopener">Baixar certificado →</a>' : '<p>Disponível depois da oficina.</p>';
+          var certificado = c.certificado ? '<a href="' + esc(c.certificado) + '" target="_blank" rel="noopener">Baixar certificado →</a>' : '<p><strong>Em breve.</strong> Estamos preparando seu certificado — ele fica disponível aqui depois da oficina.</p>';
           var aviso = c.aviso ? '<div class="student-notice"><h2>Antes de vir</h2><p class="student-note-intro">Alguns detalhes simples para você aproveitar bem a oficina.</p>' + esc(c.aviso) + '</div>' : '';
           var cancelBtn = '';
           if (featureOn('cancelamento') && c.pedido && c.pago && !c.concluido) {
@@ -247,6 +247,17 @@
         }
 
         if (featureOn('crosssell')) carregarTurmas(aluno);
+        if (featureOn('loja')) mostrarLoja();
+      }
+
+      function mostrarLoja() {
+        var url = (typeof PDV_CONFIG !== 'undefined' && PDV_CONFIG.LOJA_URL) || 'https://www.alicegussoni.com.br';
+        var blk = document.createElement('div');
+        blk.className = 'student-cross';
+        blk.innerHTML = '<h2>Suas cores, direto do ateliê</h2>' +
+          '<p>As Aquarelas da Terra, os Gizes e as peças que você viu na oficina estão na loja virtual da Alice. Continue pintando em casa.</p>' +
+          '<div class="btn-group"><a class="btn btn-primary" href="' + esc(url) + '" target="_blank" rel="noopener">Conhecer a loja virtual →</a></div>';
+        card.appendChild(blk);
       }
 
       function carregarTurmas(aluno) {

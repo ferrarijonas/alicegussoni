@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="assets/css/style.min.css?v=4">
   <link rel="icon" type="image/webp" href="assets/img/logo-alice.webp">
 </head>
-<body>
+<body data-curso="Imersão">
 
   <header class="site-header">
     <div class="header-inner">
@@ -180,6 +180,7 @@
           <h4>Contato</h4>
           <ul>
             <li><a href="https://wa.me/5534936183288" target="_blank" rel="noopener">WhatsApp Cursos: (34) 93618-3288</a></li>
+            <li><a href="https://www.alicegussoni.com.br" target="_blank" rel="noopener">Loja virtual — alicegussoni.com.br</a></li>
             <li><a href="https://www.instagram.com/alicegussoni.ceramica" target="_blank" rel="noopener">Instagram @alicegussoni.ceramica</a></li>
             <li>📍 Studio Alice — Uberlândia/MG</li>
           </ul>
@@ -194,58 +195,7 @@
   <script src="assets/js/espera.min.js"></script>
   <script src="assets/js/inscricao.min.js"></script>
 
-  <script>
-    (function () {
-      var CURSO = 'Imersão';
-      var DATA = '17/10/2026';
-      var qData = '';
-      try { qData = (new URLSearchParams(location.search)).get('data') || ''; } catch (eQ) {}
-      if (/^\d{2}\/\d{2}\/\d{4}$/.test(qData)) DATA = qData;
-
-      var cta = document.getElementById('ctaComprar') || document.querySelector('.price-box .btn-primary');
-      if (cta) cta.href = 'checkout.html?curso=' + encodeURIComponent(CURSO) + '&data=' + encodeURIComponent(DATA);
-      if (qData && /^\d{2}\/\d{2}\/\d{4}$/.test(qData)) {
-        var pData = DATA.split('/');
-        var dData = new Date(pData[2], pData[1] - 1, pData[0]);
-        var nomes = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
-        var elData = document.getElementById('courseData');
-        if (elData) elData.textContent = nomes[dData.getDay()] + ', ' + DATA;
-      }
-
-      function renderVagas(turmas) {
-        var pv = document.getElementById('cursoVagas');
-        if (!pv) return;
-        var t = null;
-        if (window.PdvLotada && Array.isArray(turmas)) t = window.PdvLotada.turmaDe(CURSO, DATA);
-        if (t === undefined) {
-          pv.innerHTML = '<div class="ck-vagas" role="status"><p class="ck-vagas-cheia">Turma ainda não foi aberta — entra na lista de espera.</p></div>';
-          return;
-        }
-        if (!t) return;
-        var rest = Number(t.restantes) || 0;
-        var alerta = (typeof PDV_CONFIG !== 'undefined' && PDV_CONFIG.VAGAS_ALERTA) || 5;
-        if (rest <= 0) {
-          pv.innerHTML = '<div class="ck-vagas" role="status"><p class="ck-vagas-cheia">TURMA LOTADA — entra na lista de espera.</p></div>';
-        } else if (rest > alerta) {
-          pv.innerHTML = '';
-        } else {
-          var cap = Number(t.vagas) || 10;
-          var occ = Number(t.ocupadas);
-          if (isNaN(occ)) occ = Math.max(0, cap - rest);
-          var segs = '';
-          for (var i = 0; i < cap; i++) segs += '<span class="seg' + (i < occ ? ' on' : '') + '"></span>';
-          var status = rest <= 3 ? '<span class="ck-vagas-status">Restam ' + rest + '</span>' : '';
-          pv.innerHTML = '<div class="ck-vagas" role="status" aria-live="polite" aria-label="' + occ + ' de ' + cap + ' vagas ocupadas na turma de ' + CURSO + '">' +
-            '<div class="ck-vagas-bar" aria-hidden="true">' + segs + '</div>' +
-            '<p class="ck-vagas-txt"><strong>' + occ + ' de ' + cap + '</strong> vagas ocupadas nesta turma' + status + '</p></div>';
-        }
-      }
-
-      if (window.PdvLotada) window.PdvLotada.buscar(renderVagas);
-      else (window._pdvLotadaPendentes = window._pdvLotadaPendentes || []).push(renderVagas);
-    })();
-  </script>
-  <script src="assets/js/lotada.min.js"></script>
+  <script src="assets/js/proximas.min.js"></script>
 <script src="assets/js/analytics.min.js"></script>
 </body>
 </html>

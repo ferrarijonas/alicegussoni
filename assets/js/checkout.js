@@ -586,6 +586,14 @@
     });
   }
 
+  function lojaCTA() {
+    var url = CONFIG.LOJA_URL || 'https://www.alicegussoni.com.br';
+    return '<div style="margin-top:18px;padding:18px;border-radius:12px;background:var(--accent-soft);text-align:center">' +
+      '<p style="font-weight:700;margin-bottom:6px">Enquanto suas peças vão pro forno…</p>' +
+      '<p style="font-size:.9rem;color:var(--text-soft);margin-bottom:12px">Leve as Aquarelas da Terra e os Gizes pra casa e já comece a pintar novas peças.</p>' +
+      '<a class="btn btn-outline" href="' + esc(url) + '" target="_blank" rel="noopener">Ver a loja virtual →</a></div>';
+  }
+
   function mostrarPixManual(res) {
     var main = qs('.checkout-main');
     var form = qs('#checkoutForm');
@@ -602,7 +610,8 @@
       '<div style="font-size:.92rem;margin-top:4px">' + esc(CONFIG.PIX_NOME || '') + '</div>' +
       '<div style="font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-soft);margin-top:8px">Chave Pix (CNPJ)</div></div>' +
       '<a class="btn btn-primary btn-lg" style="width:100%" href="https://wa.me/' + esc(CONFIG.WHATSAPP || '') + '?text=' + encodeURIComponent('Oi! Acabei de reservar minha vaga. Vou enviar o comprovante Pix de R$ ' + total) + '" target="_blank" rel="noopener">Enviar comprovante no WhatsApp</a>' +
-      '<p class="ck-hint" style="text-align:center;margin-top:12px">Assim que confirmarmos, cada pessoa recebe o acesso à Área do Estudante por e-mail (confira o spam).</p>';
+      '<p class="ck-hint" style="text-align:center;margin-top:12px">Assim que confirmarmos, cada pessoa recebe o acesso à Área do Estudante por e-mail (confira o spam).</p>' +
+      lojaCTA();
     // esconde resumo? mantém
   }
 
@@ -677,7 +686,8 @@
     succ.innerHTML = '' +
       '<h2>✓ Pagamento confirmado!</h2>' +
       '<p class="ck-panel-sub">Cada pessoa receberá o acesso à Área do Estudante por e-mail.</p>' +
-      '<p class="ck-hint" style="text-align:center">Se não chegar em alguns minutos, confira o spam ou <a href="https://wa.me/' + esc(CONFIG.WHATSAPP || '') + '" target="_blank" rel="noopener" style="font-weight:700;text-decoration:underline">fale no WhatsApp</a>.</p>';
+      '<p class="ck-hint" style="text-align:center">Se não chegar em alguns minutos, confira o spam ou <a href="https://wa.me/' + esc(CONFIG.WHATSAPP || '') + '" target="_blank" rel="noopener" style="font-weight:700;text-decoration:underline">fale no WhatsApp</a>.</p>' +
+      lojaCTA();
   }
 
   function mostrarPagamentoNaoAprovado(tipo) {

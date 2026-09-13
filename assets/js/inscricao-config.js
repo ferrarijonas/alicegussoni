@@ -7,6 +7,7 @@ var PDV_CONFIG = {
   PIX_KEY: '',
   PIX_NOME: 'Alice Gussoni',
   WHATSAPP: '5534936183288',
+  LOJA_URL: 'https://www.alicegussoni.com.br',
   PAGAMENTOS: ['pixmp', 'cartao'],
   VAGAS_ALERTA: 5
 };
