@@ -203,7 +203,11 @@ function doGet(e) {
   }
 
   if (e && e.parameter && e.parameter.acao === 'turmas') {
-    return responder(listarTurmasComVagas(true), e.parameter.callback);
+    return responder(filtrarTurmasAtivas(listarTurmasComVagas(true)), e.parameter.callback);
+  }
+
+  if (e && e.parameter && e.parameter.acao === 'proximas') {
+    return responder(proximasTurmas(), e.parameter.callback);
   }
 
   if (e && e.parameter && e.parameter.acao === 'flags') {
@@ -739,6 +743,16 @@ function criarPedido(d) {
     sel.forEach(function (c) {
       itens.push({ pessoa: p, nome: nome, whats: String(pes.whatsapp || '').trim(), email: email, cpf: cpf, curso: c });
     });
+  }
+
+  /* ---- GATE: uma oficina por vez (TURMA_ATIVA) ----
+     Recusa qualquer item de turma que não esteja à venda, antes do claim
+     (não segura reserva nem cobra). Vazia = nada à venda. */
+  if (!turmasAtivas().length) return { ok: false, erro: 'Inscrições encerradas — a próxima oficina abre em breve. Entre na lista de espera.', turma_nao_aberta: true };
+  for (var gi = 0; gi < itens.length; gi++) {
+    if (!turmaAtiva(itens[gi].curso, dataTurma)) {
+      return { ok: false, erro: 'Esta turma de ' + itens[gi].curso + ' está encerrada. Veja as próximas datas em agenda.html.', turma_nao_aberta: true };
+    }
   }
 
   var bruto = 0;
@@ -2279,8 +2293,75 @@ function listarTurmasComVagas(usarCache) {
     var oc = contarOcupadas(curso, dataTurma);
     out.push({ curso: curso, dataTurma: dataTurma, linkGrupo: linkGrupo, vagas: vagas, ocupadas: oc.ocupadas, restantes: oc.restantes, reservadas: oc.reservadas, cheia: oc.restantes <= 0 });
   }
-  try { cache.put('turmas_vagas', JSON.stringify(out), 60); } catch (eC) {}
+  try { cache.put('turmas_vagas', JSON.stringify(out), 300); } catch (eC) {}
   return out;
+}
+
+function filtrarTurmasAtivas(lista) {
+  var ativas = turmasAtivas();
+  if (!ativas.length) return [];
+  return (Array.isArray(lista) ? lista : []).filter(function (t) {
+    return turmaAtiva(t.curso, t.dataTurma);
+  });
+}
+
+/* --- PRÓXIMAS TURMAS (público) ----
+   Fonte única do front para "próxima turma": devolve as turmas futuras da
+   planilha (dataTurma >= hoje) com ocupação e a flag 'ativa' (se está à
+   venda segundo TURMA_ATIVA). Ordenadas por data. Quando nada estiver
+   agendado, devolve []. */
+function proximasTurmas() {
+  var hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+  var out = [];
+  var lista = listarTurmasComVagas(true);
+  for (var i = 0; i < lista.length; i++) {
+    var t = lista[i];
+    var d = parseDataRegistro(t.dataTurma);
+    if (!d || d.getTime() < hoje.getTime()) continue;
+    out.push({
+      curso: t.curso,
+      dataTurma: t.dataTurma,
+      vagas: t.vagas,
+      ocupadas: t.ocupadas,
+      restantes: t.restantes,
+      cheia: t.cheia,
+      ativa: turmaAtiva(t.curso, t.dataTurma)
+    });
+  }
+  out.sort(function (a, b) {
+    var da = parseDataRegistro(a.dataTurma);
+    var db = parseDataRegistro(b.dataTurma);
+    var dif = (da ? da.getTime() : 0) - (db ? db.getTime() : 0);
+    if (dif !== 0) return dif;
+    var ordem = { 'Descoberta': 0, 'Imersão': 1 };
+    return (ordem[normalizarCurso(a.curso)] || 9) - (ordem[normalizarCurso(b.curso)] || 9);
+  });
+  return out;
+}
+
+/* --- GATE DE VENDA: uma oficina por vez ----
+   TURMA_ATIVA = lista do que está à venda, formato "Curso|dd/mm/aaaa;Curso|dd/mm/aaaa".
+   Vazia/ausente = NADA à venda (fail-closed). Front e backend usam isso:
+   acao=turmas devolve só ativas; criarPedido recusa o resto. */
+function turmasAtivas() {
+  var raw = String(PROPS.getProperty('TURMA_ATIVA') || '').trim();
+  if (!raw) return [];
+  return raw.split(';').map(function (s) {
+    var p = s.split('|');
+    return { curso: String(p[0] || '').trim(), data: normalizarData(p[1]) };
+  }).filter(function (t) { return t.curso && t.data; });
+}
+
+function turmaAtiva(curso, data) {
+  var ativas = turmasAtivas();
+  if (!ativas.length) return false;
+  var c = normalizarCurso(curso);
+  var d = normalizarData(data);
+  for (var i = 0; i < ativas.length; i++) {
+    if (normalizarCurso(ativas[i].curso) === c && ativas[i].data === d) return true;
+  }
+  return false;
 }
 
 function contarOcupadas(curso, dataTurma) {
@@ -2351,6 +2432,8 @@ function parseDataRegistro(v) {
   var s = String(v).trim();
   var m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})[ T]?(\d{2}):(\d{2})/);
   if (m) return new Date(parseInt(m[3], 10), parseInt(m[2], 10) - 1, parseInt(m[1], 10), parseInt(m[4], 10), parseInt(m[5], 10));
+  var md = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (md) return new Date(parseInt(md[3], 10), parseInt(md[2], 10) - 1, parseInt(md[1], 10));
   var d = new Date(s);
   return isNaN(d.getTime()) ? null : d;
 }
@@ -2879,7 +2962,7 @@ function configurarProp(d) {
   var chave = String(d.chave || '').trim();
   var valor = String(d.valor || '');
   if (!chave) return { ok: false, erro: 'Informe a chave.' };
-  if (/^(MP_ACCESS_TOKEN|PAINEL_SENHA|SHEET_ID|WEB_APP_URL|NOTIFICAR_EMAIL|TELEGRAM_BOT_TOKEN|TELEGRAM_CHAT_ID|WHATSAPP_BRIDGE_URL|BRIDGE_TOKEN|FEATURE_LOTADA|FEATURE_CANCELAMENTO|FEATURE_LEMBRETE|FEATURE_CROSSSELL|FEATURE_SUPORTE)$/.test(chave)) {
+  if (/^(MP_ACCESS_TOKEN|PAINEL_SENHA|SHEET_ID|WEB_APP_URL|NOTIFICAR_EMAIL|TELEGRAM_BOT_TOKEN|TELEGRAM_CHAT_ID|WHATSAPP_BRIDGE_URL|BRIDGE_TOKEN|TURMA_ATIVA|FEATURE_LOTADA|FEATURE_CANCELAMENTO|FEATURE_LEMBRETE|FEATURE_CROSSSELL|FEATURE_SUPORTE)$/.test(chave)) {
     PROPS.setProperty(chave, valor);
     return { ok: true, chave: chave };
   }
