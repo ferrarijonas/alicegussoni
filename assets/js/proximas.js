@@ -131,7 +131,8 @@
       if (!t) return;
       linhas.push(esc(curso) + ' · ' + t.dataTurma.slice(0, 5) + ' · ' + horaDe(curso));
       if (t.ativa && Number(t.restantes) > 0) {
-        botoes.push('<a class="btn ' + (i === 0 ? 'btn-primary' : 'btn-outline') + ' btn-lg" href="checkout.html?curso=' + enc(curso) + '&data=' + enc(t.dataTurma) + '">Garantir vaga na ' + esc(curso) + '</a>');
+        var slug = (CURSOS[curso] && CURSOS[curso].slug) || '#';
+        botoes.push('<a class="btn ' + (i === 0 ? 'btn-primary' : 'btn-outline') + ' btn-lg" href="' + esc(slug) + '?data=' + enc(t.dataTurma) + '">Garantir vaga na ' + esc(curso) + '</a>');
       } else {
         botoes.push(botaoEspera(t.ativa ? 'Turma lotada — lista de espera' : 'Em breve — lista de espera', i === 0));
       }
