@@ -1135,6 +1135,7 @@ function finalizarPedido(pedidoId) {
     registrarLog('pago', pedidoId, 'Pagamento confirmado');
     try { fazerBackup(); } catch (eB) { Logger.log('Backup: ' + eB); }
     notificarVendaTelegram(pedidoId);
+    notificarVendaEmail(pedidoId);
   }
 }
 
@@ -2940,6 +2941,25 @@ function notificarVendaTelegram(pedidoId) {
   } catch (eT) { Logger.log('Telegram: ' + eT); }
 }
 
+function notificarVendaEmail(pedidoId) {
+  var destino = getNotificarEmail();
+  if (!destino) return;
+  var det = detalhesPedido(pedidoId);
+  if (!det) return;
+  var pessoas = det.pessoas.map(function (p) { return p.nome + ' (' + p.curso + ')'; }).join(', ');
+  var total = (Number(det.total) || 0).toFixed(2);
+  var assunto = '🎉 Vendeu uma vaga! ' + pessoas + ' — R$ ' + total;
+  var corpo = '<div style="font-family:Segoe UI,Arial,sans-serif;color:#212121;max-width:560px;margin:0 auto">' +
+    '<h2 style="color:#4A2E1B">🎉 Vendeu!</h2>' +
+    '<p>Pedido <strong>' + pedidoId + '</strong> confirmado.</p>' +
+    '<p><strong>Quem:</strong> ' + esc(pessoas) + '</p>' +
+    '<p><strong>Valor:</strong> R$ ' + total + '</p>' +
+    '<p style="color:#8A7A5C;font-size:.85rem">Alice Gussoni — Ateliê de Cerâmica</p></div>';
+  try {
+    GmailApp.sendEmail(destino, assunto, 'Vendeu! ' + pessoas + ' — R$ ' + total, { htmlBody: corpo });
+  } catch (eM) { Logger.log('Email venda: ' + eM); }
+}
+
 function telegramTeste() {
   var token = getTelegramBotToken();
   var chat = getTelegramChatId();
@@ -3088,6 +3108,10 @@ function responder(obj, callback) {
 
 function normalizarData(v) {
   if (!v) return '';
+  if (v instanceof Date) {
+    if (isNaN(v.getTime())) return '';
+    return ('0' + v.getUTCDate()).slice(-2) + '/' + ('0' + (v.getUTCMonth() + 1)).slice(-2) + '/' + v.getUTCFullYear();
+  }
   var s = String(v).trim();
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
   var d = new Date(s);
