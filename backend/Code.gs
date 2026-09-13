@@ -29,8 +29,9 @@ function getMPToken() {
   return PROPS.getProperty(chave) || '';
 }
 function getSheetId() {
-  return PROPS.getProperty('SHEET_ID') ||
-    '14_gGuMVl3oOp68y0Q1lpkde6I4uESlLJYwazICqnMMk';
+  var id = PROPS.getProperty('SHEET_ID');
+  if (id) return id;
+  try { return SpreadsheetApp.getActiveSpreadsheet().getId(); } catch (e) { return ''; }
 }
 function getPainelSenha() {
   return PROPS.getProperty('PAINEL_SENHA') || '';
@@ -39,7 +40,7 @@ function getWebAppUrl() {
   return PROPS.getProperty('WEB_APP_URL') || ScriptApp.getService().getUrl();
 }
 function getNotificarEmail() {
-  return PROPS.getProperty('NOTIFICAR_EMAIL') || 'contato@jonasferrari.com.br';
+  return PROPS.getProperty('NOTIFICAR_EMAIL') || '';
 }
 function getTelegramBotToken() {
   return PROPS.getProperty('TELEGRAM_BOT_TOKEN') || '';
@@ -142,6 +143,21 @@ function doGet(e) {
       return responder({ ok: false, erro: 'Senha incorreta.' }, e.parameter.callback);
     }
     return responder(listarPainelDados(), e.parameter.callback);
+  }
+  if (e && e.parameter && e.parameter.acao === 'notaspendentes' && e.parameter.senha === getPainelSenha()) {
+    return responder(notasPendentes(), e.parameter.callback);
+  }
+  if (e && e.parameter && e.parameter.acao === 'proximonumero' && e.parameter.senha === getPainelSenha()) {
+    return responder(proximoNumeroDPS(), e.parameter.callback);
+  }
+  if (e && e.parameter && e.parameter.acao === 'marcarnota' && e.parameter.senha === getPainelSenha()) {
+    return responder(marcarNota(e.parameter), e.parameter.callback);
+  }
+  if (e && e.parameter && e.parameter.acao === 'limparnota' && e.parameter.senha === getPainelSenha()) {
+    return responder(limparNota(e.parameter.rowId || ''), e.parameter.callback);
+  }
+  if (e && e.parameter && e.parameter.acao === 'notaporid' && e.parameter.senha === getPainelSenha()) {
+    return responder(notaPorId(e.parameter.rowId || ''), e.parameter.callback);
   }
   if (e && e.parameter && e.parameter.acao === 'regenerar') {
     if (e.parameter.senha !== getPainelSenha()) {
@@ -454,7 +470,14 @@ function doPost(e) {
       return handleWebhook(e.parameter);
     }
 
-    /* Caso 2: inscrição do site */
+    /* Caso 2: envio de NFS-e por e-mail (emissor local chama este endpoint) */
+    if ((body && body.acao === 'enviarnotaemail') || (e && e.parameter && e.parameter.acao === 'enviarnotaemail')) {
+      var notaReq = body || e.parameter;
+      if (senha !== getPainelSenha()) return jsonOut({ ok: false, erro: 'senha incorreta' });
+      return jsonOut(enviarNotaEmail(notaReq));
+    }
+
+    /* Caso 3: inscrição do site */
     return handleInscricao(body || e.parameter);
   } catch (err) {
     return jsonOut({ ok: false, erro: String(err) });
@@ -1093,8 +1116,8 @@ function finalizarPedido(pedidoId) {
   pessoaIds.forEach(function (pessoa) {
     enviarAcessoPessoa(pessoa.id, pessoa.row);
   });
-  creditarReferenciador(pedidoId);
   if (!jaEraPago) {
+    creditarReferenciador(pedidoId);
     registrarLog('pago', pedidoId, 'Pagamento confirmado');
     try { fazerBackup(); } catch (eB) { Logger.log('Backup: ' + eB); }
     notificarVendaTelegram(pedidoId);
@@ -1193,15 +1216,15 @@ function calcularDescontoPedido(itens, bruto, pessoas, codigo) {
 function creditarReferenciador(pedidoId) {
   var pSheet = getSheet('Pedidos');
   var pRows = pSheet.getDataRange().getValues();
-  var codigo = '', total = 0;
+  var codigo = '', bruto = 0;
   for (var i = 1; i < pRows.length; i++) {
     if (String(pRows[i][0]) === String(pedidoId)) {
       codigo = String(pRows[i][9] || '').trim();
-      total = Number(pRows[i][4] || 0);
+      bruto = Number(pRows[i][2] || 0);
       break;
     }
   }
-  if (!codigo || total <= 0) return;
+  if (!codigo || bruto <= 0) return;
   var convite = buscarConvite(codigo);
   if (!convite) return;
   var pesSheet = getSheet('Pessoas');
@@ -1216,7 +1239,7 @@ function creditarReferenciador(pedidoId) {
     else getSheet('Inscritos').getRange(convite.row + 1, 22).setValue(0);
     return;
   }
-  var acrescimo = Math.round(total * 0.15 * 100) / 100;
+  var acrescimo = Math.round(bruto * 0.15 * 100) / 100;
   if (convite.tipo === 'pessoas') {
     pesSheet.getRange(convite.row + 1, 11).setValue(Math.round((convite.credito + acrescimo) * 100) / 100);
   } else {
@@ -1852,6 +1875,7 @@ function atualizarInscricao(d) {
     sheet.getRange(i + 1, 3).setValue(whats);
     sheet.getRange(i + 1, 4).setValue(email);
     if (d.cpf !== undefined) sheet.getRange(i + 1, 24).setValue(normalizarCPF(String(d.cpf)));
+    if (d.credito !== undefined) sheet.getRange(i + 1, 22).setValue(Math.round((Number(d.credito) || 0) * 100) / 100);
     if (d.anotacao !== undefined) sheet.getRange(i + 1, 23).setValue(String(d.anotacao).trim());
     var pessoaId = String(rows[i][19] || '');
     if (pessoaId) {
@@ -2217,7 +2241,8 @@ function listarInscritos() {
       concluido: rows[i][15],
       pedidoId: pedidoId.indexOf('PED') === 0 ? pedidoId : '',
       pessoaId: pessoaId.indexOf('PS') === 0 ? pessoaId : '',
-      codigoConvite: rows[i][20], credito: rows[i][21], anotacao: rows[i][22], cpf: formatarCPF(rows[i][23] || '')
+      codigoConvite: rows[i][20], credito: rows[i][21], anotacao: rows[i][22], cpf: formatarCPF(rows[i][23] || ''),
+      nota: String(rows[i][24] || '').trim()
     });
   }
   return out;
@@ -2463,6 +2488,189 @@ function listarPedidos() {
     });
   }
   return out;
+}
+
+/* ---------------------------------------------------------
+   NFS-e NACIONAL — fila de emissão (disparada por script local)
+   O script Python (com certificado A1) emite no SEFIN via mTLS e
+   registra aqui o resultado. Tudo idempotente e à prova de duplicidade.
+   --------------------------------------------------------- */
+function garantirColunaNota(sheet) {
+  if (sheet.getLastColumn() < 25) sheet.getRange(1, 25).setValue('Nota');
+}
+
+function notasPendentes() {
+  var iSheet = getSheet('Inscritos');
+  var pSheet = getSheet('Pedidos');
+  garantirColunaNota(iSheet);
+  var rows = iSheet.getDataRange().getValues();
+  var pRows = pSheet.getDataRange().getValues();
+  var pedidos = {};
+  for (var i = 1; i < pRows.length; i++) {
+    pedidos[String(pRows[i][0])] = {
+      total: Number(pRows[i][4]) || 0,
+      status: String(pRows[i][1] || '').trim()
+    };
+  }
+  var contagem = {}, candidatos = [];
+  for (var j = 1; j < rows.length; j++) {
+    if (String(rows[j][9] || '').trim() !== 'pago') continue;
+    var pedId = String(rows[j][18] || '');
+    contagem[pedId] = (contagem[pedId] || 0) + 1;
+    candidatos.push({
+      linha: j,
+      rowId: String(rows[j][0] || ''),
+      pedId: pedId,
+      nome: String(rows[j][1] || '').trim(),
+      email: String(rows[j][3] || '').trim(),
+      cpf: normalizarCPF(String(rows[j][23] || '')),
+      curso: String(rows[j][4] || '').trim(),
+      dataTurma: normalizarData(rows[j][5])
+    });
+  }
+  var pendentes = [];
+  for (var k = 0; k < candidatos.length; k++) {
+    var it = candidatos[k];
+    var notaAtual = String(rows[it.linha][24] || '').trim();
+    if (/^emitida:|^isenta:|^bloqueado:/.test(notaAtual)) continue; // final
+    // 'erro:' volta pra fila (retry automático na próxima rodada)
+    var ped = pedidos[it.pedId];
+    var base = { rowId: it.rowId, nome: it.nome, email: it.email, cpf: it.cpf,
+      cpfFormatado: formatarCPF(it.cpf), curso: it.curso, dataTurma: it.dataTurma };
+    if (!ped || ped.status !== 'pago') {
+      pendentes.push(Object.assign(base, { motivo: 'pedido_nao_pago', valor: 0 }));
+      continue;
+    }
+    var n = contagem[it.pedId] || 1;
+    var valor = Math.round(ped.total / n * 100) / 100;
+    if (ped.total <= 0) {
+      pendentes.push(Object.assign(base, { motivo: 'valor_zero', valor: 0 }));
+      continue;
+    }
+    if (!validarCPF(it.cpf)) {
+      pendentes.push(Object.assign(base, { motivo: 'cpf_invalido', valor: valor }));
+      continue;
+    }
+    pendentes.push(Object.assign(base, { motivo: '', valor: valor }));
+  }
+  return { ok: true, pendentes: pendentes };
+}
+
+function proximoNumeroDPS() {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var n = parseInt(PROPS.getProperty('ULTIMO_DPS') || '0', 10) + 1;
+    PROPS.setProperty('ULTIMO_DPS', String(n));
+    return { ok: true, numero: n };
+  } catch (err) {
+    return { ok: false, erro: String(err) };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function marcarNota(p) {
+  var rowId = String(p.rowId || '').trim();
+  if (!rowId) return { ok: false, erro: 'rowId obrigatório' };
+  var chave = String(p.chave || '').trim();
+  var erro = String(p.erro || '').trim().slice(0, 150);
+  var motivo = String(p.motivo || '').trim().slice(0, 150);
+  var sheet = getSheet('Inscritos');
+  garantirColunaNota(sheet);
+  var rows = sheet.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) !== rowId) continue;
+    var atual = String(rows[i][24] || '').trim();
+    if (/^emitida:|^isenta:/.test(atual)) return { ok: false, erro: 'já possui nota (final)' };
+    var valor = chave ? 'emitida:' + chave : (erro ? 'erro:' + erro : 'isenta:' + motivo);
+    sheet.getRange(i + 1, 25).setValue(valor);
+    registrarLog('nota', rowId, chave || erro || motivo);
+    return { ok: true, rowId: rowId, valor: valor };
+  }
+  return { ok: false, erro: 'rowId não encontrado' };
+}
+
+function limparNota(rowId) {
+  var sheet = getSheet('Inscritos');
+  garantirColunaNota(sheet);
+  var rows = sheet.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) !== String(rowId).trim()) continue;
+    sheet.getRange(i + 1, 25).clearContent();
+    registrarLog('nota_limpa', rowId, '');
+    return { ok: true, rowId: String(rowId).trim() };
+  }
+  return { ok: false, erro: 'rowId não encontrado' };
+}
+
+function notaPorId(rowId) {
+  var sheet = getSheet('Inscritos');
+  garantirColunaNota(sheet);
+  var rows = sheet.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]) !== String(rowId).trim()) continue;
+    var nota = String(rows[i][24] || '').trim();
+    return {
+      ok: true,
+      rowId: String(rows[i][0]),
+      nome: String(rows[i][1] || '').trim(),
+      email: String(rows[i][3] || '').trim(),
+      cpf: normalizarCPF(String(rows[i][23] || '')),
+      curso: String(rows[i][4] || '').trim(),
+      dataTurma: normalizarData(rows[i][5]),
+      valor: Number(rows[i][6]) || 0,
+      nota: nota,
+      chave: nota.indexOf('emitida:') === 0 ? nota.slice(8) : ''
+    };
+  }
+  return { ok: false, erro: 'rowId não encontrado' };
+}
+
+function enviarNotaEmail(b) {
+  var email = String(b.email || '').trim();
+  var chave = String(b.chave || '').trim();
+  var nome = String(b.nome || '').trim();
+  var curso = String(b.curso || '').trim();
+  var dataTurma = String(b.dataTurma || '').trim();
+  var valor = String(b.valor || '').trim();
+  var rowId = String(b.rowId || '').trim();
+  if (!email || !chave) return { ok: false, erro: 'email e chave obrigatórios' };
+  var pdf = null;
+  var pdfB64 = String(b.pdfB64 || '').replace(/\s/g, '');
+  if (pdfB64) {
+    try { pdf = Utilities.base64Decode(pdfB64); } catch (ePdf) { pdf = null; }
+  }
+  var esc = function (s) {
+    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  };
+  var assunto = 'Sua Nota Fiscal (NFS-e) — Alice Gussoni';
+  var corpo = '<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#3a3126">' +
+    '<h2 style="color:#5B4432">Olá, ' + esc(nome) + '</h2>' +
+    '<p>Sua <strong>Nota Fiscal de Serviço Eletrônica (NFS-e)</strong> da oficina de ' +
+    '<strong>' + esc(curso) + '</strong>' + (dataTurma ? ' do dia <strong>' + esc(dataTurma) + '</strong>' : '') +
+    ' foi emitida com sucesso.</p>' +
+    '<table style="border-collapse:collapse;margin:14px 0">' +
+    '<tr><td style="padding:7px 12px;background:#f4efe4">Serviço</td><td style="padding:7px 12px">' + esc(curso) + '</td></tr>' +
+    '<tr><td style="padding:7px 12px;background:#f4efe4">Valor</td><td style="padding:7px 12px">R$ ' + esc(valor) + '</td></tr>' +
+    '<tr><td style="padding:7px 12px;background:#f4efe4">Chave de acesso</td><td style="padding:7px 12px">' + esc(chave) + '</td></tr>' +
+    '</table>' +
+    '<p>' + (pdf ? 'A nota está em anexo (PDF).' : 'Você pode consultar a nota no portal nacional da NFS-e usando a chave de acesso.') + '</p>' +
+    '<p>Qualquer dúvida, é só chamar no WhatsApp <strong>(34) 93618-3288</strong>.</p>' +
+    '<p>Obrigado!<br><strong>Alice Gussoni</strong> — Ateliê de Cerâmica</p></div>';
+  var opcoes = { htmlBody: corpo, name: 'Alice Gussoni' };
+  if (pdf) {
+    opcoes.attachments = [{ fileName: 'NFS-e-' + chave + '.pdf', content: pdf, mimeType: 'application/pdf' }];
+  }
+  try {
+    GmailApp.sendEmail(email, assunto, 'Sua NFS-e foi emitida. Chave de acesso: ' + chave, opcoes);
+    registrarLog('nota_email', rowId, chave, email);
+    return { ok: true };
+  } catch (err) {
+    Logger.log('enviarNotaEmail: ' + err);
+    return { ok: false, erro: String(err) };
+  }
 }
 
 function listarPainelDados() {
@@ -2910,7 +3118,7 @@ var ABAS = {
   'Inscritos': ['ID', 'Nome', 'WhatsApp', 'Email', 'Curso', 'DataTurma',
     'Valor', 'PrefID', 'PaymentID', 'Status', 'LinkEnviado', 'RegistradoEm',
     'AreaTokenHash', 'ApostilaURL', 'CertificadoURL', 'Concluido', 'AcessoEnviado', 'AreaToken',
-    'PedidoID', 'PessoaID', 'CodigoConvite', 'Credito', 'Anotacao', 'CPF'],
+    'PedidoID', 'PessoaID', 'CodigoConvite', 'Credito', 'Anotacao', 'CPF', 'Nota'],
   'Turmas': ['Curso', 'DataTurma', 'LinkGrupo', 'ApostilaURL', 'AvisoTurma', 'Vagas'],
   'Pedidos': ['PedidoID', 'Status', 'ValorBruto', 'Desconto', 'ValorTotal', 'FormaPagamento', 'RegistradoEm', 'PrefID', 'PaymentID', 'CodigoUsado', 'Anotacao', 'ClientOrderID'],
   'Pessoas': ['PessoaID', 'PedidoID', 'Nome', 'WhatsApp', 'Email', 'AreaTokenHash', 'AreaToken', 'Cursos', 'AcessoEnviado', 'CodigoConvite', 'Credito', 'Anotacao', 'CPF'],

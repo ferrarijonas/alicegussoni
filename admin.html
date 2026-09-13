@@ -390,8 +390,9 @@
     </div>
   </div>
 
+  <script src="assets/js/inscricao-config.js"></script>
   <script>
-    var ENDPOINT = 'https://script.google.com/macros/s/AKfycbxHyN1-ZU49ZH4wU92MHw8PlgLayxVSiszJ7iGG47jdampR5CrTDK2hmo4OH0koPaKRtQ/exec';
+    var ENDPOINT = (typeof PDV_CONFIG !== 'undefined' && PDV_CONFIG.WEB_APP_URL) || '';
     var dados = { inscritos: [], turmas: [], pedidos: [] };
     var callbackSeq = 0;
 

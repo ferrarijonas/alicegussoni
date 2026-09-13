@@ -29,7 +29,7 @@ Venda de vagas em cursos de cerâmica da Alice Gussoni, em Uberlândia/MG.
 2. **Frontend:** edite `.js` → gere `.min.js` (terser) → `git add/commit/push origin main` → GitHub Pages (delay ~1 min). Páginas usam os `.min.js`.
 
 ## Como EU (harness) leio os dados — "braço do projeto"
-Web App: URL do backend DA ALICE (preencher após o deploy). Acesso com senha (PAINEL_SENHA). Endpoints (JSONP ok via `&callback=`):
+Web App: `https://script.google.com/macros/s/AKfycbxJC4_OTv_lJDf4Dbh6LPIqDQByYIgPHj5hMY5J4gaqYpJwGSgGX8RO9SV86VtMB2Ib/exec` (deploy id = último segmento da URL; script id fica no `.clasp.json`, gitignored). Acesso com senha (PAINEL_SENHA). Endpoints (JSONP ok via `&callback=`):
 - `?acao=dados&senha=` → inscritos, turmas (com vagas/ocupadas/restantes), pedidos, cupons, listaEspera
 - `?acao=diagnostico&senha=` → **saúde do sistema**: resumo, turmas, erros recentes (ler no início da sessão)
 - `?acao=logs&senha=&n=` → eventos recentes (Logs)
@@ -37,6 +37,7 @@ Web App: URL do backend DA ALICE (preencher após o deploy). Acesso com senha (P
 - `?acao=analiticas&senha=` → **analítica de uso**
 - `?acao=turmas` (público, cache 60s) → ocupação
 - `?acao=listaespera` (público) · `?acao=logs` · `?acao=backup&senha=` · `?acao=criartriggerbackup&senha=` · `?acao=telegramtest&senha=` · `?acao=config&senha=&chave=&valor=` (whitelist de chaves)
+- **NFS-e:** `?acao=notaspendentes&senha=` (fila) · `?acao=proximonumero&senha=` · `?acao=marcarnota&senha=&rowId=&chave=|erro=|motivo=` · `?acao=limparnota&senha=&rowId=` · `?acao=notaporid&senha=&rowId=` · `enviarnotaemail` (POST, emissor local)
 
 Sempre use `-G --data-urlencode` com curl no PowerShell (a forma inline `?acao=x` falha intermitente).
 
@@ -48,6 +49,13 @@ Sempre use `-G --data-urlencode` com curl no PowerShell (a forma inline `?acao=x
 - `?acao=setarvagas&senha=&curso=&dataTurma=&vagas=` para ajustar.
 - Aba `ListaEspera` + `?acao=listaespera` (dedup) + `?acao=excluirespera&senha=&id=`.
 - **Idempotência:** `client_order_id` único por tentativa; LockService + CacheService + checagem na aba Pedidos.
+
+## NFS-e (nota fiscal de serviço — padrão nacional SEFIN)
+- **1 vaga paga = 1 NFS-e** (dupla = 2 notas; valor por vaga = total do pedido ÷ nº pessoas). Emissão no **`emissor.py` local** (PC, `C:\Alice\mkt\Cursos\emissor-nfse\` — FORA do git, tem certificado A1 + senha do painel). Backend só monta a fila, numera, registra e envia e-mail. **Spec mestre: `docs/NFS-E.md`.**
+- Endpoints (com `senha`): `notaspendentes` (fila de pagos sem nota, com `motivo`: vazio/cpf_invalido/pedido_nao_pago/valor_zero), `proximonumero`, `marcarnota`, `limparnota`, `notaporid`, `enviarnotaemail` (POST). Coluna **`Nota`** (aba Inscritos, col 25): `emitida:CHAVE` / `erro:MSG` (retry) / `isenta:` / `bloqueado:`.
+- **Poka-yoke:** nDPS determinístico = sufixo do rowId; `existe_dps` antes de emitir (nunca duplica); e-mail ANTES de marcar (falha de e-mail re-tenta); `E0207` (CPF inexistente na Receita) → `bloqueado` (final). **O checkout valida só os dígitos do CPF, não a existência** — CPF fabricado passa e é pego na emissão.
+- Alíquota `p_tot_trib_sn` = **4,00%** (DAS 07/2026, Anexo I Comércio) — **confirmar com a contadora da Alice** (MEI/Simples e anexo podem divergir).
+- Tarefa agendada Windows `EmissorNFSe` (diária 06:00) roda `emissor.py --emitir`. Modos: `--testa-cpf` (valida CPF truncado em homologação), `--reenviar <rowId>`.
 
 ## Convenções
 - Backend: padrões herdados — `getSheet`, `normalizarCurso`/`normalizarData`, `formatDate`, `responder(obj, callback)` (JSONP), erros em PT-BR, **sem comentários de código** (apenas blocos `/* --- */` de contexto).
