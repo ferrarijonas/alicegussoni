@@ -286,6 +286,13 @@ function doGet(e) {
     return responder(telegramTeste(), e.parameter.callback);
   }
 
+  if (e && e.parameter && e.parameter.acao === 'emailtest') {
+    if (e.parameter.senha !== getPainelSenha()) {
+      return responder({ ok: false, erro: 'Senha incorreta.' }, e.parameter.callback);
+    }
+    return responder(emailTeste(), e.parameter.callback);
+  }
+
   if (e && e.parameter && e.parameter.acao === 'analitica') {
     registrarAnalitica(e.parameter);
     return responder({ ok: true }, e.parameter.callback);
@@ -2958,6 +2965,21 @@ function notificarVendaEmail(pedidoId) {
   try {
     GmailApp.sendEmail(destino, assunto, 'Vendeu! ' + pessoas + ' — R$ ' + total, { htmlBody: corpo });
   } catch (eM) { Logger.log('Email venda: ' + eM); }
+}
+
+function emailTeste() {
+  var destino = getNotificarEmail();
+  if (!destino) return { ok: false, erro: 'Configure NOTIFICAR_EMAIL nas Script Properties.' };
+  var assunto = '🎉 Alice, vendeu! — teste do e-mail de vendas';
+  var corpo = '<div style="font-family:Segoe UI,Arial,sans-serif;color:#212121;max-width:560px;margin:0 auto">' +
+    '<h2 style="color:#4A2E1B">🎉 Vendeu! (teste)</h2>' +
+    '<p>Se você está lendo isto em <strong>' + esc(destino) + '</strong>, o e-mail de notificação de vendas está no ar.</p>' +
+    '<p>Quando uma aluna pagar, você recebe aqui: <em>“🎉 Vendeu uma vaga! Nome (Curso) — R$ ... ”</em></p>' +
+    '<p style="color:#8A7A5C;font-size:.85rem">Alice Gussoni — Ateliê de Cerâmica · teste enviado em ' + formatDate(new Date()) + '</p></div>';
+  try {
+    GmailApp.sendEmail(destino, assunto, 'Teste: e-mail de vendas configurado para ' + destino, { htmlBody: corpo });
+    return { ok: true, para: destino };
+  } catch (eM) { return { ok: false, erro: String(eM) }; }
 }
 
 function telegramTeste() {
