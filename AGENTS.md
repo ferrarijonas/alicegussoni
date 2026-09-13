@@ -26,7 +26,14 @@ Venda de vagas em cursos de cerâmica da Alice Gussoni, em Uberlândia/MG.
 
 ## Deploy
 1. **Backend:** edite `backend/Code.gs` → copie para `pdv-clasp/Code.js` → `clasp push --force` (na raiz) → `clasp deploy -i <ID_DO_DEPLOY_DA_ALICE> -d "descrição"`.
-2. **Frontend:** edite `.js` → gere `.min.js` (terser) → `git add/commit/push origin main` → GitHub Pages (delay ~1 min). Páginas usam os `.min.js`.
+2. **Frontend:** edite `.js` → gere `.min.js` (terser) → `git add <caminhos>` (**explícito**) → commit → `git push origin main` → GitHub Pages (delay ~1 min). Páginas usam os `.min.js`.
+
+## Trabalho paralelo (2+ sessões/agentes) — obrigatório
+- **Isolamento:** uma sessão por `git worktree` + branch próprio (`git worktree add ..\Site-<tema> -b feat/<tema>`). Nunca duas sessões editando o mesmo diretório.
+- **Stage explícito:** NUNCA `git add -A`, `git add -u` nem `git commit -am`. Stage caminho por caminho. Blanket-stage varre trabalho não commitado de outra sessão (foi a causa do commit cruzado `c8d4f28`, que misturou "loja virtual" com os cursos).
+- **Commit pequeno e cedo:** o que fica uncommitted é o que o outro varre.
+- **Um deploy por vez:** `clasp push` empurra o projeto inteiro — serializar entre sessões.
+- **Push:** `git pull --rebase` antes; nunca force-push.
 
 ## Como EU (harness) leio os dados — "braço do projeto"
 Web App: `https://script.google.com/macros/s/AKfycbxJC4_OTv_lJDf4Dbh6LPIqDQByYIgPHj5hMY5J4gaqYpJwGSgGX8RO9SV86VtMB2Ib/exec` (deploy id = último segmento da URL; script id fica no `.clasp.json`, gitignored). Acesso com senha (PAINEL_SENHA). Endpoints (JSONP ok via `&callback=`):
@@ -64,6 +71,7 @@ Sempre use `-G --data-urlencode` com curl no PowerShell (a forma inline `?acao=x
 - Erros do MP: `Logger.log` sempre; `registrarLog('erro', ...)` para eu ver no `diagnostico`.
 
 ## Ritual de início de sessão (obrigatório)
+0. **Isolamento — ANTES de qualquer edição:** rode `git worktree list` e `git status`. Se houver **outro worktree, outra sessão, ou qualquer trabalho não commitado que não seja seu**, NÃO edite esta pasta: crie o seu worktree e trabalhe nele (`git worktree add ..\Site-<tema> -b feat/<tema>`). Na dúvida, isole — é barato. Editar a pasta compartilhada com trabalho alheio presente é o que causa varredura (ver "Trabalho paralelo").
 1. `git log --oneline -5` (contexto recente).
 2. `?acao=diagnostico&senha=...` (saúde + turmas + erros) — quando o backend existir.
 3. Se preciso, `?acao=logs&senha=&n=30`.
