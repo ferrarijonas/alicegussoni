@@ -433,7 +433,7 @@
         if (tentou === 0) { tentou++; return tenta(); }
         (errCb || cb)({ ok: false, erro: 'Falha de conexão. Tente novamente.' });
       };
-      s.src = base + (base.indexOf('?') === -1 ? '?' : '&') + params + '&callback=' + id;
+      s.src = base + (base.indexOf('?') === -1 ? '?' : '&') + params + '&callback=' + id + '&_=' + Date.now();
       document.body.appendChild(s);
       setTimeout(function () {
         if (done) return;

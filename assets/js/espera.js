@@ -42,7 +42,7 @@
     var s = document.createElement('script');
     s.onerror = function () { if (!done) { done = true; delete window[id]; cb(null); } };
     setTimeout(function () { if (!done) { done = true; delete window[id]; cb(null); } }, 15000);
-    s.src = API + '?' + params + '&callback=' + id;
+    s.src = API + '?' + params + '&callback=' + id + '&_=' + Date.now();
     document.body.appendChild(s);
   }
 
