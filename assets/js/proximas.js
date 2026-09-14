@@ -15,12 +15,13 @@
   var NOMES_DIA = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
 
   var turmas = null;
+  var turmasEm = 0;
 
   /* --- cache de sessao (mesmo padrao do lotada.js): primeira pagina da
      sessao busca; as seguintes usam o cache. TTL curto p/ nao mostrar
      "em breve" velho quando uma turma for reaberta. --- */
   var CACHE_KEY = 'pdv_proximas';
-  var CACHE_TTL = 5 * 60 * 1000;
+  var CACHE_TTL = 60 * 1000;
 
   function cacheLer() {
     try {
@@ -78,16 +79,17 @@
     var s = document.createElement('script');
     s.onerror = function () { if (!done) { done = true; delete window[id]; cb(null); } };
     setTimeout(function () { if (!done) { done = true; delete window[id]; cb(null); } }, 15000);
-    s.src = API + '?' + params + '&callback=' + id;
+    s.src = API + '?' + params + '&callback=' + id + '&_=' + Date.now();
     document.body.appendChild(s);
   }
 
   function buscar(cb) {
-    if (turmas) return cb(turmas);
+    if (turmas && Date.now() - turmasEm < CACHE_TTL) return cb(turmas);
     var c = cacheLer();
-    if (c) { turmas = c; cb(turmas); return; }
+    if (c) { turmas = c; turmasEm = Date.now(); cb(turmas); return; }
     jsonp('acao=proximas', function (res) {
       turmas = Array.isArray(res) ? res : null;
+      turmasEm = Date.now();
       if (turmas) cacheGravar(turmas);
       cb(turmas);
     });
@@ -263,12 +265,23 @@
     });
   });
 
+  function revalidarSeExpirado() {
+    if (Date.now() - turmasEm < CACHE_TTL) return;
+    buscar(function () {
+      renderHome();
+      var curso = document.body && document.body.getAttribute('data-curso');
+      if (curso) renderCurso(curso);
+      renderAgenda();
+    });
+  }
   buscar(function () {
     renderHome();
     var curso = document.body && document.body.getAttribute('data-curso');
     if (curso) renderCurso(curso);
     renderAgenda();
   });
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') revalidarSeExpirado(); });
+  window.addEventListener('focus', revalidarSeExpirado);
 
   window.PdvProximas = {
     buscar: buscar,

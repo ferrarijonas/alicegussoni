@@ -9,7 +9,7 @@
   var API = (typeof PDV_CONFIG !== 'undefined' && PDV_CONFIG.WEB_APP_URL) || '';
   if (!API) return;
 
-  var CACHE_TTL = 5 * 60 * 1000;
+  var CACHE_TTL = 60 * 1000;
   var turmas = null;
   var falhou = false;
   var fila = [];
@@ -83,7 +83,7 @@
     window[id] = function (res) { concluir(res); };
     var s = document.createElement('script');
     s.onerror = function () { concluir(null); };
-    s.src = API + '?acao=turmas&callback=' + id;
+    s.src = API + '?acao=turmas&callback=' + id + '&_=' + Date.now();
     document.body.appendChild(s);
   }
 
@@ -271,7 +271,7 @@
     var s = document.createElement('script');
     s.onerror = function () { if (!done) { done = true; delete window[fid]; flags = null; cb(); } };
     setTimeout(function () { if (!done) { done = true; delete window[fid]; flags = null; cb(); } }, 8000);
-    s.src = API + '?acao=flags&callback=' + fid;
+    s.src = API + '?acao=flags&callback=' + fid + '&_=' + Date.now();
     document.body.appendChild(s);
   }
 
