@@ -652,7 +652,7 @@ function criarPixMP(d) {
 
   var res = UrlFetchApp.fetch(MP_API + '/v1/payments', {
     method: 'post',
-    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'X-Idempotency-Key': Utilities.getUuid() },
     payload: JSON.stringify(payload),
     muteHttpExceptions: true
   });
@@ -661,6 +661,7 @@ function criarPixMP(d) {
   var data = JSON.parse(res.getContentText());
   if (code >= 400 || !data || !data.id) {
     Logger.log('MP erro Pix: ' + code + ' ' + res.getContentText());
+    registrarLog('erro', rowId, 'MP pix ' + code + ' ' + res.getContentText().slice(0, 300));
     return { ok: false, erro: 'Não foi possível gerar o Pix.' };
   }
 
@@ -946,13 +947,17 @@ function criarPixMPPedido(pedidoId, total, email) {
   };
   var res = UrlFetchApp.fetch(MP_API + '/v1/payments', {
     method: 'post',
-    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', 'X-Idempotency-Key': String(pedidoId) },
     payload: JSON.stringify(payload),
     muteHttpExceptions: true
   });
   var code = res.getResponseCode();
   var data = JSON.parse(res.getContentText());
-  if (code >= 400 || !data || !data.id) { Logger.log('MP pix pedido erro: ' + code + ' ' + res.getContentText()); return { ok: false, erro: 'Não foi possível gerar o Pix.' }; }
+  if (code >= 400 || !data || !data.id) {
+    Logger.log('MP pix pedido erro: ' + code + ' ' + res.getContentText());
+    registrarLog('erro', pedidoId, 'MP pix ' + code + ' ' + res.getContentText().slice(0, 300));
+    return { ok: false, erro: 'Não foi possível gerar o Pix.' };
+  }
   var td = data.point_of_interaction && data.point_of_interaction.transaction_data ? data.point_of_interaction.transaction_data : {};
   return { ok: true, id: data.id, qr: td.qr_code_base64 || '', copia: td.qr_code || '' };
 }

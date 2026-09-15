@@ -4,7 +4,7 @@
    PIX_KEY / WHATSAPP = chave Pix e WhatsApp DA ALICE. */
 var PDV_CONFIG = {
   WEB_APP_URL: 'https://script.google.com/macros/s/AKfycbxJC4_OTv_lJDf4Dbh6LPIqDQByYIgPHj5hMY5J4gaqYpJwGSgGX8RO9SV86VtMB2Ib/exec',
-  PIX_KEY: '',
+  PIX_KEY: '+5534936183288',
   PIX_NOME: 'Alice Gussoni',
   WHATSAPP: '5534936183288',
   LOJA_URL: 'https://www.alicegussoni.com.br',
