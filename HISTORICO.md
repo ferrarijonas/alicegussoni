@@ -3,7 +3,7 @@
 Histórico das decisões importantes. O git conta o "o quê"; aqui está o "porquê".
 
 ## 2026-09 (NFS-e portada do repo irmão da padaria)
-- **NFS-e nacional (SEFIN) para as oficinas da Alice:** portado do commit `a988f68` da padaria (`ferrarijonas/paodeverdade`). Backend ganhou os endpoints `notaspendentes`/`proximonumero`/`marcarnota`/`limparnota`/`notaporid`/`enviarnotaemail`, coluna `Nota` (aba Inscritos, col 25) e e-mail da nota. Emissão fica no `emissor.py` local (`C:\Alice\mkt\Cursos\emissor-nfse\`, fora do git, com certificado A1). **Spec: `docs/NFS-E.md`.**
+- **NFS-e nacional (SEFIN) para as oficinas da Alice:** portado do commit `a988f68` da padaria (`ferrarijonas/paodeverdade`). Backend ganhou os endpoints `notaspendentes`/`proximonumero`/`marcarnota`/`limparnota`/`notaporid`/`enviarnotaemail`, coluna `Nota` (aba Inscritos, col 25) e e-mail da nota. Emissão fica no `emissor.py` local (`C:\Alice\financeiro\emissor-nfse\`, fora do git; segredos em `C:\Alice\financeiro\.secrets\`). **Spec: `docs/NFS-E.md`.**
 - **Junto veio o fix do crédito de convite** (mesmo commit da padaria): `creditarReferenciador` rodava fora do guard `!jaEraPago` (replay de webhook creditava 15% várias vezes) e usava `total` em vez de `bruto`. Agora só na 1ª transição e `bruto × 0,15`.
 - **Cursos mapeados:** `Descoberta` e `Imersão` (o emissor normaliza pelo nome; cTribNac/NBS/alíquota a confirmar com a contadora).
 - **Não portado (não aplicável à cerâmica):** Método/Timer/Receitas, TTS/voz — específicos de panificação.

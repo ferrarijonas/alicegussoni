@@ -58,7 +58,7 @@ Sempre use `-G --data-urlencode` com curl no PowerShell (a forma inline `?acao=x
 - **Idempotência:** `client_order_id` único por tentativa; LockService + CacheService + checagem na aba Pedidos.
 
 ## NFS-e (nota fiscal de serviço — padrão nacional SEFIN)
-- **1 vaga paga = 1 NFS-e** (dupla = 2 notas; valor por vaga = total do pedido ÷ nº pessoas). Emissão no **`emissor.py` local** (PC, `C:\Alice\mkt\Cursos\emissor-nfse\` — FORA do git, tem certificado A1 + senha do painel). Backend só monta a fila, numera, registra e envia e-mail. **Spec mestre: `docs/NFS-E.md`.**
+- **1 vaga paga = 1 NFS-e** (dupla = 2 notas; valor por vaga = total do pedido ÷ nº pessoas). Emissão no **`emissor.py` local** (PC, `C:\Alice\financeiro\emissor-nfse\` — FORA do git; segredos/certificado em `C:\Alice\financeiro\.secrets\`). Backend só monta a fila, numera, registra e envia e-mail. **Spec mestre: `docs/NFS-E.md`.**
 - Endpoints (com `senha`): `notaspendentes` (fila de pagos sem nota, com `motivo`: vazio/cpf_invalido/pedido_nao_pago/valor_zero), `proximonumero`, `marcarnota`, `limparnota`, `notaporid`, `enviarnotaemail` (POST). Coluna **`Nota`** (aba Inscritos, col 25): `emitida:CHAVE` / `erro:MSG` (retry) / `isenta:` / `bloqueado:`.
 - **Poka-yoke:** nDPS determinístico = sufixo do rowId; `existe_dps` antes de emitir (nunca duplica); e-mail ANTES de marcar (falha de e-mail re-tenta); `E0207` (CPF inexistente na Receita) → `bloqueado` (final). **O checkout valida só os dígitos do CPF, não a existência** — CPF fabricado passa e é pego na emissão.
 - Alíquota `p_tot_trib_sn` = **4,00%** (DAS 07/2026, Anexo I Comércio) — **confirmar com a contadora da Alice** (MEI/Simples e anexo podem divergir).

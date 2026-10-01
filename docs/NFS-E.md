@@ -1,8 +1,8 @@
 # NFS-e Nacional — Alice Gussoni (spec mestre)
 
-> **STATUS: PARADO — retomar depois.** Código já portado e no repo (backend + emissor
-> local + esta spec). Falta a identidade fiscal da Alice (ver "O que falta para operar").
-> **Não deployar/ativar até decidirmos retomar.**
+> **STATUS: EM OPERAÇÃO (produção).** Backend + emissor local ativos; identidade fiscal
+> da Alice configurada. O emissor e os segredos agora vivem no domínio `financeiro`
+> (`C:\Alice\financeiro\` — ver `financeiro\README.md`). Esta spec descreve o fluxo.
 
 Sistema de emissão automática de **Nota Fiscal de Serviço Eletrônica** (padrão
 nacional SEFIN/Receita) para cada vaga paga de oficina (Descoberta/Imersão).
@@ -32,7 +32,7 @@ SEFIN Nacional (https://sefin.nfse.gov.br/SefinNacional/nfse)
 | Componente | Onde | Papel |
 |---|---|---|
 | `backend/Code.gs` | Google Apps Script | fila, numeração, registro, e-mail |
-| `emissor.py` | `C:\Alice\mkt\Cursos\emissor-nfse\` (PC, fora do git) | emissão via SEFIN com certificado A1 |
+| `emissor.py` | `C:\Alice\financeiro\emissor-nfse\` (PC, fora do git) | emissão via SEFIN com certificado A1 |
 | `config.json` | junto ao `emissor.py` | segredos + ambiente + alíquota (**não commitar**) |
 | Tarefa `EmissorNFSe` | Windows Task Scheduler, diária 06:00 | roda `emissor.py --emitir` |
 
@@ -106,13 +106,14 @@ Fluxo por vaga (à prova de erro):
 | e-mail não chega | enviado antes de marcar → fila re-tenta | rodar de novo ou `--reenviar <rowId>` |
 | DANFSe oficial fora | ADN instável | fallback local automático (PDF gerado do XML) |
 
-## O que falta para operar (dados da Alice)
+## Configuração (concluída)
 
-1. **Certificado A1** (`.pfx`) + senha — no PC, em `emissor-nfse\`.
-2. **CNPJ/MEI + razão social + Inscrição Municipal** do prestador.
-3. **Endereço fiscal** (CEP, logradouro, número, bairro) e **município IBGE** (3170206 Uberlândia).
-4. **Enquadramento fiscal** (MEI ou Simples/ME) + **alíquota efetiva do DAS** (`p_tot_trib_sn`) + **código de serviço** (cTribNac/NBS) — **confirmar com a contadora**.
-5. **WEB_APP_URL** e **PAINEL_SENHA** do backend dela (para o emissor falar com o Apps Script).
-6. Criar o **`.clasp.json` novo** apontando para o script DA ALICE (nunca o da padaria) e fazer o deploy do backend.
+1. **Certificado A1** — `C:\Alice\financeiro\.secrets\certificado.pfx` (válido até 01/06/2027).
+2. **Prestador** — STUDIO ALICE ARTESANATOS LTDA, CNPJ 66.992.904/0001-59 (Simples Nacional / ME).
+3. **Endereço fiscal** — Av. Doutor Laerte Vieira Gonçalves, 522, Santa Mônica, Uberlândia/MG, CEP 38.408-176 (IBGE 3170206).
+4. **Serviço** — cTribNac `080201` / NBS `122051900`; **alíquota/código a confirmar com a contadora**.
+5. **Backend** — `WEB_APP_URL`/`PAINEL_SENHA` configurados; `.clasp.json` da Alice deployado (script próprio).
+6. **Série** — `900` (webservice, faixa 00001–49999).
 
-> Enquanto os itens 1–5 não existirem, `emissor.py` roda só em **dry-run** (não emite nada).
+> Detalhes atualizados em `C:\Alice\financeiro\README.md` e `financeiro\emissor-nfse\README.md`.
+> Pendência única: confirmar enquadramento/código com a contadora.

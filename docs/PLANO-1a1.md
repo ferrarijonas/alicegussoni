@@ -79,7 +79,7 @@ PDF gerado **no navegador** do aluno (html2canvas + jspdf), nº de registro atri
 
 ## Fase 5 — NFS-e  ·  PARADO (retomar depois)
 
-Backend + `docs/NFS-E.md` + emissor local em `C:\Alice\mkt\Cursos\emissor-nfse\` já prontos.
+Backend + `docs/NFS-E.md` + emissor local em `C:\Alice\financeiro\emissor-nfse\` já prontos.
 Pendências em `docs/NFS-E.md` → "O que falta para operar". **Não ativar até decidirmos.**
 
 ---
