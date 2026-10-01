@@ -863,8 +863,10 @@ function criarPedido(d) {
         cursosDaPessoa.push(it.curso);
         var rowId = generateId(iSheet);
         iSheet.appendRow([rowId, it.nome, it.whats, it.email, it.curso, dataTurma, precoCurso(it.curso), '', '', 'aguardando', 'não', formatDate(now), hashToken(areaToken), '', '', '', 'não', 'não', pedidoId, pessoaId, codigoConvite, 0, '', cpfNorm]);
+        iSheet.getRange(iSheet.getLastRow(), 24).setNumberFormat('@').setValue(cpfNorm);
       });
       pesSheet.appendRow([pessoaId, pedidoId, String(pdata.nome || '').trim(), String(pdata.whatsapp || '').trim(), String(pdata.email || '').trim(), hashToken(areaToken), areaToken, cursosDaPessoa.join(', '), 'não', codigoConvite, 0, '', cpfNorm]);
+      pesSheet.getRange(pesSheet.getLastRow(), 13).setNumberFormat('@').setValue(cpfNorm);
       pessoasCriadas.push({ pessoaId: pessoaId, nome: String(pdata.nome || '').trim(), email: String(pdata.email || '').trim(), cursos: cursosDaPessoa });
     }
   } finally { try { vlock.releaseLock(); } catch (eR2) {} }
@@ -1908,7 +1910,7 @@ function atualizarInscricao(d) {
     sheet.getRange(i + 1, 2).setValue(nome);
     sheet.getRange(i + 1, 3).setValue(whats);
     sheet.getRange(i + 1, 4).setValue(email);
-    if (d.cpf !== undefined) sheet.getRange(i + 1, 24).setValue(normalizarCPF(String(d.cpf)));
+    if (d.cpf !== undefined) sheet.getRange(i + 1, 24).setNumberFormat('@').setValue(normalizarCPF(String(d.cpf)));
     if (d.credito !== undefined) sheet.getRange(i + 1, 22).setValue(Math.round((Number(d.credito) || 0) * 100) / 100);
     if (d.anotacao !== undefined) sheet.getRange(i + 1, 23).setValue(String(d.anotacao).trim());
     var pessoaId = String(rows[i][19] || '');
@@ -1920,7 +1922,7 @@ function atualizarInscricao(d) {
           pesSheet.getRange(j + 1, 3).setValue(nome);
           pesSheet.getRange(j + 1, 4).setValue(whats);
           pesSheet.getRange(j + 1, 5).setValue(email);
-          if (d.cpf !== undefined) pesSheet.getRange(j + 1, 13).setValue(normalizarCPF(String(d.cpf)));
+          if (d.cpf !== undefined) pesSheet.getRange(j + 1, 13).setNumberFormat('@').setValue(normalizarCPF(String(d.cpf)));
           if (d.anotacao !== undefined) pesSheet.getRange(j + 1, 12).setValue(String(d.anotacao).trim());
           break;
         }
@@ -2697,7 +2699,16 @@ function notasPendentes() {
     var base = { rowId: it.rowId, nome: it.nome, email: it.email, cpf: it.cpf,
       cpfFormatado: formatarCPF(it.cpf), curso: it.curso, dataTurma: it.dataTurma };
     if (!ped || ped.status !== 'pago') {
-      pendentes.push(Object.assign(base, { motivo: 'pedido_nao_pago', valor: 0 }));
+      var vProprio = Number(rows[it.linha][6]) || 0;
+      if (vProprio > 0) {
+        if (!validarCPF(it.cpf)) {
+          pendentes.push(Object.assign(base, { motivo: 'cpf_invalido', valor: vProprio }));
+        } else {
+          pendentes.push(Object.assign(base, { motivo: '', valor: vProprio }));
+        }
+      } else {
+        pendentes.push(Object.assign(base, { motivo: 'pedido_nao_pago', valor: 0 }));
+      }
       continue;
     }
     var n = contagem[it.pedId] || 1;
